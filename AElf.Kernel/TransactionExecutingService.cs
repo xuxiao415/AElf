@@ -9,14 +9,14 @@ using QuickGraph;
 
 namespace AElf.Kernel
 {
-    public class TransactionExecutingManager : ITransactionExecutingService
+    public class TransactionExecutingService : ITransactionExecutingService
     {
         public Dictionary<int, List<ITransaction>> ExecutingPlan { get; private set; }
         private Dictionary<Hash, List<ITransaction>> _pending;
         private UndirectedGraph<ITransaction, Edge<ITransaction>> _graph;
         private readonly ISmartContractService _smartContractService;
 
-        public TransactionExecutingManager(ISmartContractService smartContractService)
+        public TransactionExecutingService(ISmartContractService smartContractService)
         {
             _smartContractService = smartContractService;
         }
@@ -31,16 +31,8 @@ namespace AElf.Kernel
         public async Task ExecuteAsync(ITransaction tx, IChainContext chain)
         {
             var smartContract = await _smartContractService.GetAsync(tx.To, chain);
-            
-            var context=new SmartContractInvokeContext()
-            {
-                Caller = tx.From,
-                IncrementId = tx.IncrementId,
-                MethodName = tx.MethodName,
-                Params = tx.Params
-            };
-            
-            await smartContract.InvokeAsync(context);
+
+            await smartContract.InvokeAsync(tx.From, tx.MethodName, tx.Params);
         }
 
         
