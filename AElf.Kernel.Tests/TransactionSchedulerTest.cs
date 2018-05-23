@@ -64,7 +64,7 @@ namespace AElf.Kernel.Tests
             return transaction.Object;
         }
 
-        
+        /*
         [Fact]
         public void SchedulerTest()
         {
@@ -252,6 +252,6 @@ namespace AElf.Kernel.Tests
             
         }
 
-        
+        */
     }
 }

@@ -11,9 +11,9 @@ namespace AElf.Kernel
 {
     public class TransactionExecutingService : ITransactionExecutingService
     {
-        public Dictionary<int, List<ITransaction>> ExecutingPlan { get; private set; }
+        /*public Dictionary<int, List<ITransaction>> ExecutingPlan { get; private set; }
         private Dictionary<Hash, List<ITransaction>> _pending;
-        private UndirectedGraph<ITransaction, Edge<ITransaction>> _graph;
+        private UndirectedGraph<ITransaction, Edge<ITransaction>> _graph;*/
         private readonly ISmartContractService _smartContractService;
 
         public TransactionExecutingService(ISmartContractService smartContractService)
@@ -43,7 +43,7 @@ namespace AElf.Kernel
             await smartContract.InvokeAsync(context);
         }
 
-        
+        /*
         /// <summary>
         /// Schedule execution of transaction
         /// </summary>
@@ -164,7 +164,7 @@ namespace AElf.Kernel
                 }
             }
             
-        }
+        }*/
         
     }
 }
