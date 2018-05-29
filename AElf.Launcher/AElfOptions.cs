@@ -5,7 +5,7 @@ namespace AElf.Launcher
 {
     public class AElfOptions
     {
-        [Option('b', HelpText = "Replaces the bootnode list. Format IP:Port")]
+        [Option('b', HelpText = "Replaces the bootnode list. Format: IP:Port")]
         public IEnumerable<string> Bootnodes { get; set; }
         
         [Option(HelpText = "Sets an initial list of peers. Format: IP:Port")]
