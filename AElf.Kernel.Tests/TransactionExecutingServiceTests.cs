@@ -43,7 +43,7 @@ namespace AElf.Kernel.Tests
             };
 
             var context = _chainContextService.GetChainContext(chain);
-            await _transactionExecutingService.ExecuteAsync(tx, context );
+            await _transactionExecutingService.ExecuteAsync(tx );
         }
     }
 }
