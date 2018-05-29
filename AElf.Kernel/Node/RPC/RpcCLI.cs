@@ -12,6 +12,25 @@ namespace AElf.Kernel.Node.RPC
                               "(1) Get Transaction by TxID\n" +
                               "(2) Insert Transaction\n" +
                               "(3) Broadcast Transaction\n");
+
+            string exec = Console.ReadLine();
+
+            if (exec == "1")
+            {
+                
+            } 
+            else if (exec == "2")
+            {
+                
+            } 
+            else if (exec == "3")
+            {
+                
+            }
+            else
+            {
+                
+            }
         }
     }
 }
