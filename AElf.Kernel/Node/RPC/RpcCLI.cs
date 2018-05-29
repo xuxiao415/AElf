@@ -1,10 +1,31 @@
 ﻿using System;
+using System.Text;
+using System.Threading.Tasks;
+using Google.Protobuf;
+using NLog;
 
 namespace AElf.Kernel.Node.RPC
 {
     public class RpcCLI
     {
-        static void Main(string[] args)
+        private MainChainNode _node;
+
+        /// <summary>
+        /// This method start the server that listens for incoming
+        /// connections and sets up the manager.
+        /// </summary>
+        /// <param name="node"></param>
+        public void Start(MainChainNode node)
+        {
+            _node = node;
+            Greeting();
+        }
+        
+        /// <summary>
+        /// This initialises the CLI and provides the user
+        /// with a menu.
+        /// </summary>
+        private void Greeting()
         {
             Console.WriteLine("Welcome to AElf\n" +
                               "This is the command-line interface for the RPC API.\n" +
@@ -18,6 +39,7 @@ namespace AElf.Kernel.Node.RPC
             switch (exec)
             {
                 case "1":
+                    GetTx();
                     break;
                 case "2":
                     break;
@@ -26,6 +48,16 @@ namespace AElf.Kernel.Node.RPC
                 default:
                     break;
             }
+        }
+
+        private async void GetTx()
+        {
+            Console.Clear();
+            Console.WriteLine("Please enter the hash of the transaction you are looking for: \n");
+            string hash = Console.ReadLine();
+            await _node.GetTransaction(new Hash(ByteString.CopyFrom(hash, Encoding.Unicode)));
+            
+            throw new NotImplementedException(); // Do we want to return the tx as JSON to the console?
         }
     }
 }
