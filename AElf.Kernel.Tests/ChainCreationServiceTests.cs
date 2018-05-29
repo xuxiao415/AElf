@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using AElf.Kernel.Extensions;
 using AElf.Kernel.KernelAccount;
+using AElf.Kernel.Services;
 using Xunit;
 using Xunit.Frameworks.Autofac;
 
@@ -21,6 +22,7 @@ namespace AElf.Kernel.Tests
         {
             await _service.CreateNewChainAsync(
                 new Hash("Hello".CalculateHash()), typeof(SmartContractZero));
+
         }
     }
 }

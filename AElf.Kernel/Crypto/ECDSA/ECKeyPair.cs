@@ -12,5 +12,20 @@ namespace AElf.Kernel.Crypto.ECDSA
             PublicKey = publicKey;
             PrivateKey = privateKey;
         }
+
+        public byte[] GetPublicKey(bool compressed = false)
+        {
+            return PublicKey.Q.GetEncoded(compressed);
+        }
+
+        public static ECKeyPair FromPublicKey(byte[] publicKey)
+        {
+            ECPublicKeyParameters pubKey 
+                = new ECPublicKeyParameters(Parameters.Curve.Curve.DecodePoint(publicKey), Parameters.DomainParams);
+            
+            ECKeyPair k = new ECKeyPair(null, pubKey);
+
+            return k;
+        }
     }
 }
