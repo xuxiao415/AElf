@@ -15,21 +15,16 @@ namespace AElf.Kernel.Node.RPC
 
             string exec = Console.ReadLine();
 
-            if (exec == "1")
+            switch (exec)
             {
-                
-            } 
-            else if (exec == "2")
-            {
-                
-            } 
-            else if (exec == "3")
-            {
-                
-            }
-            else
-            {
-                
+                case "1":
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    break;
+                default:
+                    break;
             }
         }
     }
