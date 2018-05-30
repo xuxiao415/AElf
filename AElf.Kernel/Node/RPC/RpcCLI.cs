@@ -27,6 +27,7 @@ namespace AElf.Kernel.Node.RPC
         /// </summary>
         private static void Greeting()
         {
+            // Maybe below code could be automated to read from list of commands to dynamically load this?
             Console.WriteLine("Welcome to AElf\n" +
                               "This is the command-line interface for the RPC API.\n" +
                               "Please select from the following options:\n" +
