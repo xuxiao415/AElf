@@ -45,6 +45,7 @@ namespace AElf.Kernel.Node.RPC
                     InsertTx();
                     break;
                 case "3":
+                    BroadcastTx();
                     break;
                 default:
                     break;
@@ -68,6 +69,14 @@ namespace AElf.Kernel.Node.RPC
             Console.WriteLine("Please enter the transaction you wish to insert:\n");
             
             throw new NotImplementedException(); // JObject?
+        }
+
+        private static void BroadcastTx()
+        {
+            Console.Clear();
+            Console.WriteLine("Please enter the transaction you wish to broadcast:\n");
+            
+            throw new NotImplementedException();
         }
     }
 }
