@@ -42,6 +42,7 @@ namespace AElf.Kernel.Node.RPC
                     GetTx();
                     break;
                 case "2":
+                    InsertTx();
                     break;
                 case "3":
                     break;
@@ -53,11 +54,17 @@ namespace AElf.Kernel.Node.RPC
         private async void GetTx()
         {
             Console.Clear();
-            Console.WriteLine("Please enter the hash of the transaction you are looking for: \n");
+            Console.WriteLine("Please enter the hash of the transaction you are looking for:\n");
             string hash = Console.ReadLine();
             await _node.GetTransaction(new Hash(ByteString.CopyFrom(hash, Encoding.Unicode)));
             
             throw new NotImplementedException(); // Do we want to return the tx as JSON to the console?
+        }
+
+        private async void InsertTx()
+        {
+            Console.Clear();
+            Console.WriteLine("Please enter the transaction you wish to insert:\n");
         }
     }
 }
