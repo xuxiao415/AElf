@@ -8,16 +8,16 @@ namespace AElf.Kernel.Node.RPC
 {
     public class RpcCLI
     {
-        private MainChainNode _node;
+        private RpcServer _server; 
 
         /// <summary>
         /// This method start the server that listens for incoming
         /// connections and sets up the manager.
         /// </summary>
         /// <param name="node"></param>
-        public void Start(MainChainNode node)
+        public void Start(RpcServer server)
         {
-            _node = node;
+            _server = server;
             Greeting();
         }
         
@@ -25,7 +25,7 @@ namespace AElf.Kernel.Node.RPC
         /// This initialises the CLI and provides the user
         /// with a menu.
         /// </summary>
-        private void Greeting()
+        private static void Greeting()
         {
             Console.WriteLine("Welcome to AElf\n" +
                               "This is the command-line interface for the RPC API.\n" +
@@ -51,20 +51,23 @@ namespace AElf.Kernel.Node.RPC
             }
         }
 
-        private async void GetTx()
+        private static void GetTx()
         {
             Console.Clear();
             Console.WriteLine("Please enter the hash of the transaction you are looking for:\n");
             string hash = Console.ReadLine();
-            await _node.GetTransaction(new Hash(ByteString.CopyFrom(hash, Encoding.Unicode)));
+            
+            // trigger _server.ProcessGetTx() - Build the JObject by asking for values?
             
             throw new NotImplementedException(); // Do we want to return the tx as JSON to the console?
         }
 
-        private async void InsertTx()
+        private static void InsertTx()
         {
             Console.Clear();
             Console.WriteLine("Please enter the transaction you wish to insert:\n");
+            
+            throw new NotImplementedException(); // JObject?
         }
     }
 }
