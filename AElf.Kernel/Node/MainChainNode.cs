@@ -711,7 +711,7 @@ namespace AElf.Kernel.Node
 
                             await BroadcastBlock(firstBlock);
                             
-                            _logger.Log(LogLevel.Debug, "Genereate first extra block: {0}, with {1} transactions, able to mine in {2}", firstBlock.GetHash(),
+                            _logger.Log(LogLevel.Debug, "Generate first extra block: {0}, with {1} transactions, able to mine in {2}", firstBlock.GetHash(),
                                 firstBlock.Body.Transactions.Count, DateTime.UtcNow.ToString("u"));
 
                             return;
