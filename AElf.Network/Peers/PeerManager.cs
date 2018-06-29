@@ -315,8 +315,15 @@ namespace AElf.Network.Peers
             // Don't add a peer already in the list
             if (GetPeer(peer) != null)
                 return false;
-            
-            _peers.Add(peer);
+
+            if (peer.IsBootnode)
+            {
+                _bootnodePeers.Add(peer);
+            }
+            else
+            {
+                _peers.Add(peer);
+            }
             
             peer.MessageReceived += ProcessPeerMessage;
             peer.PeerDisconnected += ProcessClientDisconnection;
@@ -359,15 +366,24 @@ namespace AElf.Network.Peers
         }
         
         /// <summary>
-        /// Removes a peer from the list of peers.
+        /// Removes a peer from the list of peers/bootnodes.
         /// </summary>
         /// <param name="peer">the peer to remove</param>
         public void RemovePeer(IPeer peer)
         {
             if (peer == null)
                 return;
-            _peers.Remove(peer);
-            _logger?.Trace("Peer removed : " + peer);
+
+            if (peer.IsBootnode)
+            {
+                _bootnodePeers.Remove(peer);
+                _logger?.Trace("Bootnode removed : " + peer);
+            }
+            else
+            {
+                _peers.Remove(peer);
+                _logger?.Trace("Peer removed : " + peer);
+            }
         }
 
         public List<IPeer> GetPeers()
