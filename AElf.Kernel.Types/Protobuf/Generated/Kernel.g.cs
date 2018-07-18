@@ -80,14 +80,19 @@ namespace AElf.Kernel {
             "CVJvdW5kSW5mbxIiCgRJbmZvGAEgAygLMhQuUm91bmRJbmZvLkluZm9FbnRy",
             "eRo0CglJbmZvRW50cnkSCwoDa2V5GAEgASgJEhYKBXZhbHVlGAIgASgLMgcu",
             "QlBJbmZvOgI4ASIpCghEUG9TSW5mbxIdCglSb3VuZEluZm8YASADKAsyCi5S",
-            "b3VuZEluZm8qPAoGU3RhdHVzEg4KCk5vdEV4aXN0ZWQQABILCgdQZW5kaW5n",
-            "EAESCgoGRmFpbGVkEAISCQoFTWluZWQQAypeCg5EYXRhQWNjZXNzTW9kZRIa",
-            "ChZSZWFkT25seUFjY291bnRTaGFyaW5nEAASGwoXUmVhZFdyaXRlQWNjb3Vu",
-            "dFNoYXJpbmcQARITCg9BY2NvdW50U3BlY2lmaWMQAkIOqgILQUVsZi5LZXJu",
-            "ZWxiBnByb3RvMw=="));
+            "b3VuZEluZm8iLQoDS2V5Eg0KBVZhbHVlGAEgASgMEhcKBHR5cGUYAiABKA4y",
+            "CS5UeXBlTmFtZSo8CgZTdGF0dXMSDgoKTm90RXhpc3RlZBAAEgsKB1BlbmRp",
+            "bmcQARIKCgZGYWlsZWQQAhIJCgVNaW5lZBADKl4KDkRhdGFBY2Nlc3NNb2Rl",
+            "EhoKFlJlYWRPbmx5QWNjb3VudFNoYXJpbmcQABIbChdSZWFkV3JpdGVBY2Nv",
+            "dW50U2hhcmluZxABEhMKD0FjY291bnRTcGVjaWZpYxACKrYBCghUeXBlTmFt",
+            "ZRIJCgVCeXRlcxAAEgoKBlN0cmluZxABEgcKA0ludBACEggKBFVpbnQQAxII",
+            "CgRMb25nEAQSCQoFVWxvbmcQBRIKCgZIZWFkZXIQBhIICgRCb2R5EAcSCwoH",
+            "Q2hhaW5JZBAIEggKBFBhdGgQCRILCgdQb2ludGVyEAoSEQoNU21hcnRDb250",
+            "cmFjdBALEgkKBVRyS2V5EAwSBgoCVHgQDRILCgdXc0Jsb2NrEA5CDqoCC0FF",
+            "bGYuS2VybmVsYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::AElf.Kernel.HashReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AElf.Kernel.Status), typeof(global::AElf.Kernel.DataAccessMode), }, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AElf.Kernel.Status), typeof(global::AElf.Kernel.DataAccessMode), typeof(global::AElf.Kernel.TypeName), }, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.Transaction), global::AElf.Kernel.Transaction.Parser, new[]{ "From", "To", "IncrementId", "MethodName", "Params", "Fee", "R", "S", "P" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.TransactionResult), global::AElf.Kernel.TransactionResult.Parser, new[]{ "TransactionId", "Status", "Logs", "RetVal" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.StateValueChange), global::AElf.Kernel.StateValueChange.Parser, new[]{ "Path", "BeforeValue", "AfterValue" }, null, null, null),
@@ -109,7 +114,8 @@ namespace AElf.Kernel {
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.BlockProducer), global::AElf.Kernel.BlockProducer.Parser, new[]{ "Nodes" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.BPInfo), global::AElf.Kernel.BPInfo.Parser, new[]{ "Order", "IsEBP", "InValue", "OutValue", "Signature", "TimeSlot" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.RoundInfo), global::AElf.Kernel.RoundInfo.Parser, new[]{ "Info" }, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.DPoSInfo), global::AElf.Kernel.DPoSInfo.Parser, new[]{ "RoundInfo" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.DPoSInfo), global::AElf.Kernel.DPoSInfo.Parser, new[]{ "RoundInfo" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::AElf.Kernel.Key), global::AElf.Kernel.Key.Parser, new[]{ "Value", "Type" }, null, null, null)
           }));
     }
     #endregion
@@ -127,6 +133,24 @@ namespace AElf.Kernel {
     [pbr::OriginalName("ReadOnlyAccountSharing")] ReadOnlyAccountSharing = 0,
     [pbr::OriginalName("ReadWriteAccountSharing")] ReadWriteAccountSharing = 1,
     [pbr::OriginalName("AccountSpecific")] AccountSpecific = 2,
+  }
+
+  public enum TypeName {
+    [pbr::OriginalName("Bytes")] Bytes = 0,
+    [pbr::OriginalName("String")] String = 1,
+    [pbr::OriginalName("Int")] Int = 2,
+    [pbr::OriginalName("Uint")] Uint = 3,
+    [pbr::OriginalName("Long")] Long = 4,
+    [pbr::OriginalName("Ulong")] Ulong = 5,
+    [pbr::OriginalName("Header")] Header = 6,
+    [pbr::OriginalName("Body")] Body = 7,
+    [pbr::OriginalName("ChainId")] ChainId = 8,
+    [pbr::OriginalName("Path")] Path = 9,
+    [pbr::OriginalName("Pointer")] Pointer = 10,
+    [pbr::OriginalName("SmartContract")] SmartContract = 11,
+    [pbr::OriginalName("TrKey")] TrKey = 12,
+    [pbr::OriginalName("Tx")] Tx = 13,
+    [pbr::OriginalName("WsBlock")] WsBlock = 14,
   }
 
   #endregion
@@ -157,8 +181,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Transaction(Transaction other) : this() {
-      From = other.from_ != null ? other.From.Clone() : null;
-      To = other.to_ != null ? other.To.Clone() : null;
+      from_ = other.from_ != null ? other.from_.Clone() : null;
+      to_ = other.to_ != null ? other.to_.Clone() : null;
       incrementId_ = other.incrementId_;
       methodName_ = other.methodName_;
       params_ = other.params_;
@@ -522,7 +546,7 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public TransactionResult(TransactionResult other) : this() {
-      TransactionId = other.transactionId_ != null ? other.TransactionId.Clone() : null;
+      transactionId_ = other.transactionId_ != null ? other.transactionId_.Clone() : null;
       status_ = other.status_;
       logs_ = other.logs_.Clone();
       retVal_ = other.retVal_;
@@ -733,7 +757,7 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public StateValueChange(StateValueChange other) : this() {
-      Path = other.path_ != null ? other.Path.Clone() : null;
+      path_ = other.path_ != null ? other.path_.Clone() : null;
       beforeValue_ = other.beforeValue_;
       afterValue_ = other.afterValue_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -925,7 +949,7 @@ namespace AElf.Kernel {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public EventField(EventField other) : this() {
       name_ = other.name_;
-      Value = other.value_ != null ? other.Value.Clone() : null;
+      value_ = other.value_ != null ? other.value_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1087,8 +1111,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public LogEvent(LogEvent other) : this() {
-      Address = other.address_ != null ? other.Address.Clone() : null;
-      Topic = other.topic_ != null ? other.Topic.Clone() : null;
+      address_ = other.address_ != null ? other.address_.Clone() : null;
+      topic_ = other.topic_ != null ? other.topic_.Clone() : null;
       details_ = other.details_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -1454,15 +1478,15 @@ namespace AElf.Kernel {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public BlockHeader(BlockHeader other) : this() {
       version_ = other.version_;
-      PreviousBlockHash = other.previousBlockHash_ != null ? other.PreviousBlockHash.Clone() : null;
-      MerkleTreeRootOfTransactions = other.merkleTreeRootOfTransactions_ != null ? other.MerkleTreeRootOfTransactions.Clone() : null;
-      MerkleTreeRootOfWorldState = other.merkleTreeRootOfWorldState_ != null ? other.MerkleTreeRootOfWorldState.Clone() : null;
+      previousBlockHash_ = other.previousBlockHash_ != null ? other.previousBlockHash_.Clone() : null;
+      merkleTreeRootOfTransactions_ = other.merkleTreeRootOfTransactions_ != null ? other.merkleTreeRootOfTransactions_.Clone() : null;
+      merkleTreeRootOfWorldState_ = other.merkleTreeRootOfWorldState_ != null ? other.merkleTreeRootOfWorldState_.Clone() : null;
       index_ = other.index_;
       r_ = other.r_;
       s_ = other.s_;
       p_ = other.p_;
-      Time = other.time_ != null ? other.Time.Clone() : null;
-      ChainId = other.chainId_ != null ? other.ChainId.Clone() : null;
+      time_ = other.time_ != null ? other.time_.Clone() : null;
+      chainId_ = other.chainId_ != null ? other.chainId_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1864,7 +1888,7 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public BlockBody(BlockBody other) : this() {
-      BlockHeader = other.blockHeader_ != null ? other.BlockHeader.Clone() : null;
+      blockHeader_ = other.blockHeader_ != null ? other.blockHeader_.Clone() : null;
       transactions_ = other.transactions_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -2019,8 +2043,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Block(Block other) : this() {
-      Header = other.header_ != null ? other.Header.Clone() : null;
-      Body = other.body_ != null ? other.Body.Clone() : null;
+      header_ = other.header_ != null ? other.header_.Clone() : null;
+      body_ = other.body_ != null ? other.body_.Clone() : null;
       fullTransactions_ = other.fullTransactions_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -2209,7 +2233,7 @@ namespace AElf.Kernel {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public SmartContractRegistration(SmartContractRegistration other) : this() {
       category_ = other.category_;
-      ContractHash = other.contractHash_ != null ? other.ContractHash.Clone() : null;
+      contractHash_ = other.contractHash_ != null ? other.contractHash_.Clone() : null;
       contractBytes_ = other.contractBytes_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -2399,8 +2423,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public SmartContractDeployment(SmartContractDeployment other) : this() {
-      ContractHash = other.contractHash_ != null ? other.ContractHash.Clone() : null;
-      Caller = other.caller_ != null ? other.Caller.Clone() : null;
+      contractHash_ = other.contractHash_ != null ? other.contractHash_.Clone() : null;
+      caller_ = other.caller_ != null ? other.caller_.Clone() : null;
       constructParams_ = other.constructParams_;
       incrementId_ = other.incrementId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -3239,7 +3263,7 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public SmartContractInvokeContext(SmartContractInvokeContext other) : this() {
-      Caller = other.caller_ != null ? other.Caller.Clone() : null;
+      caller_ = other.caller_ != null ? other.caller_.Clone() : null;
       incrementId_ = other.incrementId_;
       methodName_ = other.methodName_;
       params_ = other.params_;
@@ -3459,9 +3483,9 @@ namespace AElf.Kernel {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Change(Change other) : this() {
       befores_ = other.befores_.Clone();
-      After = other.after_ != null ? other.After.Clone() : null;
-      TransactionIds = other.transactionIds_ != null ? other.TransactionIds.Clone() : null;
-      LatestChangedBlockHash = other.latestChangedBlockHash_ != null ? other.LatestChangedBlockHash.Clone() : null;
+      after_ = other.after_ != null ? other.after_.Clone() : null;
+      transactionIds_ = other.transactionIds_ != null ? other.transactionIds_.Clone() : null;
+      latestChangedBlockHash_ = other.latestChangedBlockHash_ != null ? other.latestChangedBlockHash_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3681,8 +3705,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public PairHashChange(PairHashChange other) : this() {
-      Key = other.key_ != null ? other.Key.Clone() : null;
-      Value = other.value_ != null ? other.Value.Clone() : null;
+      key_ = other.key_ != null ? other.key_.Clone() : null;
+      value_ = other.value_ != null ? other.value_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3971,8 +3995,8 @@ namespace AElf.Kernel {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Chain(Chain other) : this() {
-      Id = other.id_ != null ? other.Id.Clone() : null;
-      GenesisBlockHash = other.genesisBlockHash_ != null ? other.GenesisBlockHash.Clone() : null;
+      id_ = other.id_ != null ? other.id_.Clone() : null;
+      genesisBlockHash_ = other.genesisBlockHash_ != null ? other.genesisBlockHash_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -4263,10 +4287,10 @@ namespace AElf.Kernel {
     public BPInfo(BPInfo other) : this() {
       order_ = other.order_;
       isEBP_ = other.isEBP_;
-      InValue = other.inValue_ != null ? other.InValue.Clone() : null;
-      OutValue = other.outValue_ != null ? other.OutValue.Clone() : null;
-      Signature = other.signature_ != null ? other.Signature.Clone() : null;
-      TimeSlot = other.timeSlot_ != null ? other.TimeSlot.Clone() : null;
+      inValue_ = other.inValue_ != null ? other.inValue_.Clone() : null;
+      outValue_ = other.outValue_ != null ? other.outValue_.Clone() : null;
+      signature_ = other.signature_ != null ? other.signature_.Clone() : null;
+      timeSlot_ = other.timeSlot_ != null ? other.timeSlot_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -4766,6 +4790,163 @@ namespace AElf.Kernel {
             break;
           case 10: {
             roundInfo_.AddEntriesFrom(input, _repeated_roundInfo_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class Key : pb::IMessage<Key> {
+    private static readonly pb::MessageParser<Key> _parser = new pb::MessageParser<Key>(() => new Key());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<Key> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::AElf.Kernel.KernelReflection.Descriptor.MessageTypes[22]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public Key() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public Key(Key other) : this() {
+      value_ = other.value_;
+      type_ = other.type_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public Key Clone() {
+      return new Key(this);
+    }
+
+    /// <summary>Field number for the "Value" field.</summary>
+    public const int ValueFieldNumber = 1;
+    private pb::ByteString value_ = pb::ByteString.Empty;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pb::ByteString Value {
+      get { return value_; }
+      set {
+        value_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 2;
+    private global::AElf.Kernel.TypeName type_ = 0;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::AElf.Kernel.TypeName Type {
+      get { return type_; }
+      set {
+        type_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as Key);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(Key other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Value != other.Value) return false;
+      if (Type != other.Type) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Value.Length != 0) hash ^= Value.GetHashCode();
+      if (Type != 0) hash ^= Type.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Value.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteBytes(Value);
+      }
+      if (Type != 0) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Type);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Value.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Value);
+      }
+      if (Type != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(Key other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Value.Length != 0) {
+        Value = other.Value;
+      }
+      if (other.Type != 0) {
+        Type = other.Type;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Value = input.ReadBytes();
+            break;
+          }
+          case 16: {
+            type_ = (global::AElf.Kernel.TypeName) input.ReadEnum();
             break;
           }
         }

@@ -181,3 +181,26 @@ enum DataAccessMode {
     ReadWriteAccountSharing = 1;
     AccountSpecific = 2;
 }
+
+message Key{
+    bytes Value = 1;
+    TypeName type = 2;
+}
+
+enum TypeName{
+    Bytes = 0;
+    String = 1;
+    Int = 2;
+    Uint = 3;
+    Long = 4;
+    Ulong = 5;
+    Header = 6;
+    Body = 7;
+    ChainId = 8;
+    Path = 9;
+    Pointer = 10;
+    SmartContract = 11;
+    TrKey = 12;
+    Tx = 13;
+    WsBlock =14;
+}

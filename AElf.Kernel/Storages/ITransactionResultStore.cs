@@ -6,6 +6,6 @@ namespace AElf.Kernel.Storages
     public interface ITransactionResultStore
     {
         Task InsertAsync(Hash trKey, TransactionResult result);
-        Task<TransactionResult> GetAsync(Hash hash);
+        Task<TransactionResult> GetAsync(Hash trKey);
     }
 }
