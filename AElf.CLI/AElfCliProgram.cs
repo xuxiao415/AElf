@@ -152,24 +152,13 @@ namespace AElf.CLI
                         }
                         
                         // RPC
-                        var t = parsedCmd.Args.ElementAt(0);
-                        var data = parsedCmd.Args.ElementAt(1);
-
-                        byte[] sd;
-                        try
-                        {
-                            sd = ByteArrayHelpers.FromHexString(data);
-                        }
-                        catch (Exception e)
-                        {
-                            _screenManager.PrintError("Wrong data formant.");
-                            return;
-                        }
-
+                        var key = parsedCmd.Args.ElementAt(0);
+                        var value = parsedCmd.Args.ElementAt(1);
+                        
                         object dd;
                         try
                         {
-                            dd = Deserializer.Deserialize(t, sd);
+                            dd = Deserializer.Deserialize(key, value);
                         }
                         catch (Exception e)
                         {

@@ -95,7 +95,7 @@ namespace AElf.Kernel
         {
             var key=new Key
             {
-                Type = TypeName.Header,
+                Type = type,
                 Value = ByteString.CopyFrom(GetHashBytes())
             }.ToByteArray().ToHex();
 

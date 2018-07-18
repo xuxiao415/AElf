@@ -15,14 +15,14 @@ namespace AElf.Kernel.Storages
     
         public async Task<IChain> GetAsync(Hash id)
         {
-            var key = id.GetKeyString(TypeName.ChainId);
+            var key = id.GetKeyString(TypeName.TnChain);
             var chainBytes = await _keyValueDatabase.GetAsync(key, typeof(Chain));
             return chainBytes == null ? null : Chain.Parser.ParseFrom(chainBytes);
         }
 
         public async Task<IChain> UpdateAsync(IChain chain)
         {
-            var key = chain.Id.GetKeyString(TypeName.ChainId);
+            var key = chain.Id.GetKeyString(TypeName.TnChain);
             var bytes = chain.Serialize();
             await _keyValueDatabase.SetAsync(key, bytes);
             return chain;
@@ -30,7 +30,7 @@ namespace AElf.Kernel.Storages
 
         public async Task<IChain> InsertAsync(IChain chain)
         {
-            var key = chain.Id.GetKeyString(TypeName.ChainId);
+            var key = chain.Id.GetKeyString(TypeName.TnChain);
             await _keyValueDatabase.SetAsync(key, chain.Serialize());
             return chain;
         }

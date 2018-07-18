@@ -15,13 +15,13 @@ namespace AElf.Kernel.Storages
  
          public async Task InsertAsync(Hash trKey, TransactionResult result)
          {
-             var key = trKey.GetKeyString(TypeName.TrKey);
+             var key = trKey.GetKeyString(TypeName.TnTransactionResult);
              await _keyValueDatabase.SetAsync(key, result.Serialize());
          }
  
          public async Task<TransactionResult> GetAsync(Hash trKey)
          {
-             var key = trKey.GetKeyString(TypeName.TrKey);
+             var key = trKey.GetKeyString(TypeName.TnTransactionResult);
              var txResultBytes = await _keyValueDatabase.GetAsync(key, typeof(TransactionResult));
              return txResultBytes == null ? null : TransactionResult.Parser.ParseFrom(txResultBytes);
          }

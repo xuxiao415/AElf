@@ -18,21 +18,21 @@ namespace AElf.Kernel.Storages
 
         public async Task<Hash> InsertAsync(ITransaction tx)
         {
-            var key = tx.GetHash().GetKeyString(TypeName.Tx);           
+            var key = tx.GetHash().GetKeyString(TypeName.TnTransaction);           
             await _keyValueDatabase.SetAsync(key, tx.Serialize());
-            return key;
+            return tx.GetHash();
         }
 
         public async Task<ITransaction> GetAsync(Hash hash)
         {
-            var key = hash.GetKeyString(TypeName.Tx);    
+            var key = hash.GetKeyString(TypeName.TnTransaction);    
             var txBytes = await _keyValueDatabase.GetAsync(key, typeof(ITransaction));
             return txBytes == null ? null : Transaction.Parser.ParseFrom(txBytes);
         }
 
         public async Task RemoveAsync(Hash hash)
         {
-            var key = hash.GetKeyString(TypeName.Tx);   
+            var key = hash.GetKeyString(TypeName.TnTransaction);   
             await _keyValueDatabase.RemoveAsync(key);
         }
     }

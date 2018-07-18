@@ -84,12 +84,12 @@ namespace AElf.Kernel {
             "CS5UeXBlTmFtZSo8CgZTdGF0dXMSDgoKTm90RXhpc3RlZBAAEgsKB1BlbmRp",
             "bmcQARIKCgZGYWlsZWQQAhIJCgVNaW5lZBADKl4KDkRhdGFBY2Nlc3NNb2Rl",
             "EhoKFlJlYWRPbmx5QWNjb3VudFNoYXJpbmcQABIbChdSZWFkV3JpdGVBY2Nv",
-            "dW50U2hhcmluZxABEhMKD0FjY291bnRTcGVjaWZpYxACKrYBCghUeXBlTmFt",
-            "ZRIJCgVCeXRlcxAAEgoKBlN0cmluZxABEgcKA0ludBACEggKBFVpbnQQAxII",
-            "CgRMb25nEAQSCQoFVWxvbmcQBRIKCgZIZWFkZXIQBhIICgRCb2R5EAcSCwoH",
-            "Q2hhaW5JZBAIEggKBFBhdGgQCRILCgdQb2ludGVyEAoSEQoNU21hcnRDb250",
-            "cmFjdBALEgkKBVRyS2V5EAwSBgoCVHgQDRILCgdXc0Jsb2NrEA5CDqoCC0FF",
-            "bGYuS2VybmVsYgZwcm90bzM="));
+            "dW50U2hhcmluZxABEhMKD0FjY291bnRTcGVjaWZpYxACKrQBCghUeXBlTmFt",
+            "ZRIJCgVCeXRlcxAAEg8KC1RuQmxvY2tCb2R5EAESEQoNVG5CbG9ja0hlYWRl",
+            "chACEgsKB1RuQ2hhaW4QAxIMCghUbkNoYW5nZRAEEh8KG1RuU21hcnRDb250",
+            "cmFjdFJlZ2lzdHJhdGlvbhAFEhcKE1RuVHJhbnNhY3Rpb25SZXN1bHQQBhIR",
+            "Cg1UblRyYW5zYWN0aW9uEAcSEQoNVG5DaGFuZ2VzRGljdBAIQg6qAgtBRWxm",
+            "Lktlcm5lbGIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::AElf.Kernel.HashReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AElf.Kernel.Status), typeof(global::AElf.Kernel.DataAccessMode), typeof(global::AElf.Kernel.TypeName), }, new pbr::GeneratedClrTypeInfo[] {
@@ -137,20 +137,14 @@ namespace AElf.Kernel {
 
   public enum TypeName {
     [pbr::OriginalName("Bytes")] Bytes = 0,
-    [pbr::OriginalName("String")] String = 1,
-    [pbr::OriginalName("Int")] Int = 2,
-    [pbr::OriginalName("Uint")] Uint = 3,
-    [pbr::OriginalName("Long")] Long = 4,
-    [pbr::OriginalName("Ulong")] Ulong = 5,
-    [pbr::OriginalName("Header")] Header = 6,
-    [pbr::OriginalName("Body")] Body = 7,
-    [pbr::OriginalName("ChainId")] ChainId = 8,
-    [pbr::OriginalName("Path")] Path = 9,
-    [pbr::OriginalName("Pointer")] Pointer = 10,
-    [pbr::OriginalName("SmartContract")] SmartContract = 11,
-    [pbr::OriginalName("TrKey")] TrKey = 12,
-    [pbr::OriginalName("Tx")] Tx = 13,
-    [pbr::OriginalName("WsBlock")] WsBlock = 14,
+    [pbr::OriginalName("TnBlockBody")] TnBlockBody = 1,
+    [pbr::OriginalName("TnBlockHeader")] TnBlockHeader = 2,
+    [pbr::OriginalName("TnChain")] TnChain = 3,
+    [pbr::OriginalName("TnChange")] TnChange = 4,
+    [pbr::OriginalName("TnSmartContractRegistration")] TnSmartContractRegistration = 5,
+    [pbr::OriginalName("TnTransactionResult")] TnTransactionResult = 6,
+    [pbr::OriginalName("TnTransaction")] TnTransaction = 7,
+    [pbr::OriginalName("TnChangesDict")] TnChangesDict = 8,
   }
 
   #endregion

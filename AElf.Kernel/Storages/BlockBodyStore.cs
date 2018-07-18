@@ -15,7 +15,7 @@ namespace AElf.Kernel.Storages
 
         public async Task InsertAsync(Hash bodyHash, IBlockBody body)
         {           
-            var key = bodyHash.GetKeyString(TypeName.Body);
+            var key = bodyHash.GetKeyString(TypeName.TnBlockBody);
             await _keyValueDatabase.SetAsync(key, body.Serialize());
         }
 
@@ -23,7 +23,7 @@ namespace AElf.Kernel.Storages
         {
             try
             {
-                var key = bodyHash.GetKeyString(TypeName.Body);
+                var key = bodyHash.GetKeyString(TypeName.TnBlockBody);
                 var blockBody =  await _keyValueDatabase.GetAsync(key, typeof(BlockBody));
                 return BlockBody.Parser.ParseFrom(blockBody);
             }
