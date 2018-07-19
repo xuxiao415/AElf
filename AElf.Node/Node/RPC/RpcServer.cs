@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 using AElf.ChainController;
+using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Kernel.Node.RPC
 {
@@ -37,6 +38,7 @@ namespace AElf.Kernel.Node.RPC
         private const string GetDeserializedData = "get_deserialized_result";
         private const string GetBlockHeight = "get_block_height";
         private const string GetBlockInfo = "get_block_info";
+        private const string GetDeserializedInfo = "get_deserialized_info";
         /// <summary>
         /// The names of the exposed RPC methods and also the
         /// names used in the JSON to perform a call.
@@ -55,7 +57,8 @@ namespace AElf.Kernel.Node.RPC
             GetGenesisiAddress,
             GetDeserializedData,
             GetBlockHeight,
-            GetBlockInfo
+            GetBlockInfo,
+            GetDeserializedInfo
         };
 
         /// <summary>
@@ -235,6 +238,9 @@ namespace AElf.Kernel.Node.RPC
                     case GetBlockInfo:
                         responseData = await ProGetBlockInfo(reqParams);
                         break;
+                    case GetDeserializedInfo:
+                        responseData = ProGetDeserializedInfo(reqParams);
+                        break;
                     default:
                         Console.WriteLine("Method name not found"); // todo log
                         break;
@@ -253,6 +259,51 @@ namespace AElf.Kernel.Node.RPC
             {
                 Console.WriteLine(e);
             }
+        }
+
+        private JObject ProGetDeserializedInfo(JObject reqParams)
+        {
+            var sKey = reqParams["key"].ToString();
+            var byteValue = (reqParams["value"]?.ToObject<byte[]>());                
+            var byteKey = ByteArrayHelpers.FromHexString(sKey);
+            var key = Key.Parser.ParseFrom(byteKey);
+            var keyType = key.Type;
+            var obj = new JObject();
+
+            switch (keyType)
+            {
+                case TypeName.Bytes:
+                    obj = JObject.FromObject(BytesValue.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnBlockHeader:
+                    obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnBlockBody:
+                    obj = JObject.FromObject(BlockBody.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnChain:
+                    obj = JObject.FromObject(Chain.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnChange:
+                    obj = JObject.FromObject(Change.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnSmartContractRegistration:
+                    obj = JObject.FromObject(SmartContractRegistration.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnTransactionResult:
+                    obj = JObject.FromObject(TransactionResult.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnTransaction:
+                    obj = JObject.FromObject(Transaction.Parser.ParseFrom(byteValue));
+                    break;
+                case TypeName.TnChangesDict:
+                    obj = JObject.FromObject(ChangesDict.Parser.ParseFrom(byteValue));
+                    break;
+                default:
+                    Console.WriteLine("Type name not found");
+                    break;
+            }
+            return JObject.FromObject(obj);
         }
 
         private async Task<JObject> ProGetBlockInfo(JObject reqParams)

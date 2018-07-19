@@ -150,15 +150,26 @@ namespace AElf.CLI
                             _screenManager.PrintError(str);
                             return;
                         }
-                        
+
                         // RPC
-                        var key = parsedCmd.Args.ElementAt(0);
-                        var value = parsedCmd.Args.ElementAt(1);
-                        
+                        var t = parsedCmd.Args.ElementAt(0);
+                        var data = parsedCmd.Args.ElementAt(1);
+
+                        byte[] sd;
+                        try
+                        {
+                            sd = ByteArrayHelpers.FromHexString(data);
+                        }
+                        catch (Exception e)
+                        {
+                            _screenManager.PrintError("Wrong data formant.");
+                            return;
+                        }
+
                         object dd;
                         try
                         {
-                            dd = Deserializer.Deserialize(key, value);
+                            dd = Deserializer.Deserialize(t, sd);
                         }
                         catch (Exception e)
                         {
@@ -179,7 +190,7 @@ namespace AElf.CLI
                         return;
                     }
                 }
-                
+
                 if (def is LoadContractAbiCmd l)
                 {
                     error = l.Validate(parsedCmd);
