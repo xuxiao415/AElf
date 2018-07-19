@@ -264,46 +264,67 @@ namespace AElf.Kernel.Node.RPC
         private JObject ProGetDeserializedInfo(JObject reqParams)
         {
             var sKey = reqParams["key"].ToString();
-            var byteValue = (reqParams["value"]?.ToObject<byte[]>());                
-            var byteKey = ByteArrayHelpers.FromHexString(sKey);
-            var key = Key.Parser.ParseFrom(byteKey);
-            var keyType = key.Type;
-            var obj = new JObject();
-
-            switch (keyType)
+            var sValue = reqParams["value"].ToString();
+            
+            var byteValue = new byte[sValue.Length / 2];
+            for (var x = 0; x < byteValue.Length; x++)
             {
-                case TypeName.Bytes:
-                    obj = JObject.FromObject(BytesValue.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnBlockHeader:
-                    obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnBlockBody:
-                    obj = JObject.FromObject(BlockBody.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnChain:
-                    obj = JObject.FromObject(Chain.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnChange:
-                    obj = JObject.FromObject(Change.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnSmartContractRegistration:
-                    obj = JObject.FromObject(SmartContractRegistration.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnTransactionResult:
-                    obj = JObject.FromObject(TransactionResult.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnTransaction:
-                    obj = JObject.FromObject(Transaction.Parser.ParseFrom(byteValue));
-                    break;
-                case TypeName.TnChangesDict:
-                    obj = JObject.FromObject(ChangesDict.Parser.ParseFrom(byteValue));
-                    break;
-                default:
-                    Console.WriteLine("Type name not found");
-                    break;
+                var i = Convert.ToInt32(sValue.Substring(x * 2, 2), 16);
+                byteValue[x] = (byte)i;
             }
-            return JObject.FromObject(obj);
+
+            try
+            {
+                var byteKey = ByteArrayHelpers.FromHexString(sKey);
+                var key = Key.Parser.ParseFrom(byteKey);
+                var keyType = key.Type;
+                var obj = new JObject();                
+
+                switch (keyType)
+                {
+                    case TypeName.Bytes:
+                        //obj = JObject.FromObject(BytesValue.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnBlockHeader:
+                        obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnBlockBody:
+                        obj = JObject.FromObject(BlockBody.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnChain:
+                        obj = JObject.FromObject(Chain.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnChange:
+                        obj = JObject.FromObject(Change.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnSmartContractRegistration:
+                        obj = JObject.FromObject(SmartContractRegistration.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnTransactionResult:
+                        obj = JObject.FromObject(TransactionResult.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnTransaction:
+                        obj = JObject.FromObject(Transaction.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnChangesDict:
+                        obj = JObject.FromObject(ChangesDict.Parser.ParseFrom(byteValue));
+                        break;
+                    default:
+                        Console.WriteLine("Type name not found");
+                        break;
+                }
+
+                return JObject.FromObject(new JObject
+                {
+                    ["TypeName"] = keyType.ToString(),
+                    ["Value"] = obj
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return null;
+            }            
         }
 
         private async Task<JObject> ProGetBlockInfo(JObject reqParams)
