@@ -283,7 +283,7 @@ namespace AElf.Kernel.Node.RPC
                 switch (keyType)
                 {
                     case TypeName.Bytes:
-                        //obj = JObject.FromObject(BytesValue.Parser.ParseFrom(byteValue));
+                        obj = JObject.FromObject(byteValue);
                         break;
                     case TypeName.TnBlockHeader:
                         obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
