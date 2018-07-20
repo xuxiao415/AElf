@@ -273,18 +273,21 @@ namespace AElf.Kernel.Node.RPC
                 byteValue[x] = (byte)i;
             }
 
-            try
-            {
-                var byteKey = ByteArrayHelpers.FromHexString(sKey);
-                var key = Key.Parser.ParseFrom(byteKey);
-                var keyType = key.Type;
-                var obj = new JObject();                
+            var byteKey = ByteArrayHelpers.FromHexString(sKey);
+            var key = Key.Parser.ParseFrom(byteKey);
+            var keyType = key.Type;
+            var obj = new JObject();
 
+            try
+            {               
                 switch (keyType)
                 {
                     case TypeName.Bytes:
-                        obj = JObject.FromObject(byteValue);
-                        break;
+                        return JObject.FromObject(new JObject
+                        {
+                            ["TypeName"] = keyType.ToString(),
+                            ["Value"] = byteValue
+                        });                        
                     case TypeName.TnBlockHeader:
                         obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
                         break;
@@ -310,8 +313,11 @@ namespace AElf.Kernel.Node.RPC
                         obj = JObject.FromObject(ChangesDict.Parser.ParseFrom(byteValue));
                         break;
                     default:
-                        Console.WriteLine("Type name not found");
-                        break;
+                        return JObject.FromObject(new JObject
+                        {
+                            ["TypeName"] = keyType.ToString(),
+                            ["Value"] = "Type name not found"
+                        });                       
                 }
 
                 return JObject.FromObject(new JObject
@@ -322,8 +328,11 @@ namespace AElf.Kernel.Node.RPC
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
-                return null;
+                return JObject.FromObject(new JObject
+                {
+                    ["TypeName"] = keyType.ToString(),
+                    ["Value"] = e.ToString()
+                }); ;
             }            
         }
 
