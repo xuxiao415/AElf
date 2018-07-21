@@ -189,12 +189,18 @@ message Key{
 
 enum TypeName{
     Bytes = 0;
-    TnBlockBody = 1;
-    TnBlockHeader = 2;
-    TnChain = 3;
-    TnChange = 4;
-    TnSmartContractRegistration = 5;
-    TnTransactionResult = 6;
-    TnTransaction = 7;
-    TnChangesDict = 8;
+    UInt64Valaue=1;
+    Ulong=2;
+    TnHash=3;
+    TnBlockBody = 4;
+    TnBlockHeader = 5;
+    TnChain = 6;
+    TnChange = 7;
+    TnSmartContractRegistration = 8;
+    TnTransactionResult = 9;
+    TnTransaction = 10;
+    TnChangesDict = 11;
+    SerializeFunctionMetadataMap=12;
+    SerializeContractMetadataTemplateMap=13;
+    CallingGraphEdges=14;
 }

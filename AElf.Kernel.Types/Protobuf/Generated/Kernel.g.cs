@@ -84,12 +84,15 @@ namespace AElf.Kernel {
             "CS5UeXBlTmFtZSo8CgZTdGF0dXMSDgoKTm90RXhpc3RlZBAAEgsKB1BlbmRp",
             "bmcQARIKCgZGYWlsZWQQAhIJCgVNaW5lZBADKl4KDkRhdGFBY2Nlc3NNb2Rl",
             "EhoKFlJlYWRPbmx5QWNjb3VudFNoYXJpbmcQABIbChdSZWFkV3JpdGVBY2Nv",
-            "dW50U2hhcmluZxABEhMKD0FjY291bnRTcGVjaWZpYxACKrQBCghUeXBlTmFt",
-            "ZRIJCgVCeXRlcxAAEg8KC1RuQmxvY2tCb2R5EAESEQoNVG5CbG9ja0hlYWRl",
-            "chACEgsKB1RuQ2hhaW4QAxIMCghUbkNoYW5nZRAEEh8KG1RuU21hcnRDb250",
-            "cmFjdFJlZ2lzdHJhdGlvbhAFEhcKE1RuVHJhbnNhY3Rpb25SZXN1bHQQBhIR",
-            "Cg1UblRyYW5zYWN0aW9uEAcSEQoNVG5DaGFuZ2VzRGljdBAIQg6qAgtBRWxm",
-            "Lktlcm5lbGIGcHJvdG8z"));
+            "dW50U2hhcmluZxABEhMKD0FjY291bnRTcGVjaWZpYxACKsACCghUeXBlTmFt",
+            "ZRIJCgVCeXRlcxAAEhAKDFVJbnQ2NFZhbGF1ZRABEgkKBVVsb25nEAISCgoG",
+            "VG5IYXNoEAMSDwoLVG5CbG9ja0JvZHkQBBIRCg1UbkJsb2NrSGVhZGVyEAUS",
+            "CwoHVG5DaGFpbhAGEgwKCFRuQ2hhbmdlEAcSHwobVG5TbWFydENvbnRyYWN0",
+            "UmVnaXN0cmF0aW9uEAgSFwoTVG5UcmFuc2FjdGlvblJlc3VsdBAJEhEKDVRu",
+            "VHJhbnNhY3Rpb24QChIRCg1UbkNoYW5nZXNEaWN0EAsSIAocU2VyaWFsaXpl",
+            "RnVuY3Rpb25NZXRhZGF0YU1hcBAMEigKJFNlcmlhbGl6ZUNvbnRyYWN0TWV0",
+            "YWRhdGFUZW1wbGF0ZU1hcBANEhUKEUNhbGxpbmdHcmFwaEVkZ2VzEA5CDqoC",
+            "C0FFbGYuS2VybmVsYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.AnyReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::AElf.Kernel.HashReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::AElf.Kernel.Status), typeof(global::AElf.Kernel.DataAccessMode), typeof(global::AElf.Kernel.TypeName), }, new pbr::GeneratedClrTypeInfo[] {
@@ -137,14 +140,20 @@ namespace AElf.Kernel {
 
   public enum TypeName {
     [pbr::OriginalName("Bytes")] Bytes = 0,
-    [pbr::OriginalName("TnBlockBody")] TnBlockBody = 1,
-    [pbr::OriginalName("TnBlockHeader")] TnBlockHeader = 2,
-    [pbr::OriginalName("TnChain")] TnChain = 3,
-    [pbr::OriginalName("TnChange")] TnChange = 4,
-    [pbr::OriginalName("TnSmartContractRegistration")] TnSmartContractRegistration = 5,
-    [pbr::OriginalName("TnTransactionResult")] TnTransactionResult = 6,
-    [pbr::OriginalName("TnTransaction")] TnTransaction = 7,
-    [pbr::OriginalName("TnChangesDict")] TnChangesDict = 8,
+    [pbr::OriginalName("UInt64Valaue")] Uint64Valaue = 1,
+    [pbr::OriginalName("Ulong")] Ulong = 2,
+    [pbr::OriginalName("TnHash")] TnHash = 3,
+    [pbr::OriginalName("TnBlockBody")] TnBlockBody = 4,
+    [pbr::OriginalName("TnBlockHeader")] TnBlockHeader = 5,
+    [pbr::OriginalName("TnChain")] TnChain = 6,
+    [pbr::OriginalName("TnChange")] TnChange = 7,
+    [pbr::OriginalName("TnSmartContractRegistration")] TnSmartContractRegistration = 8,
+    [pbr::OriginalName("TnTransactionResult")] TnTransactionResult = 9,
+    [pbr::OriginalName("TnTransaction")] TnTransaction = 10,
+    [pbr::OriginalName("TnChangesDict")] TnChangesDict = 11,
+    [pbr::OriginalName("SerializeFunctionMetadataMap")] SerializeFunctionMetadataMap = 12,
+    [pbr::OriginalName("SerializeContractMetadataTemplateMap")] SerializeContractMetadataTemplateMap = 13,
+    [pbr::OriginalName("CallingGraphEdges")] CallingGraphEdges = 14,
   }
 
   #endregion
