@@ -189,7 +189,7 @@ message Key{
 
 enum TypeName{
     Bytes = 0;
-    UInt64Valaue=1;
+    UInt64Value=1;
     Ulong=2;
     TnHash=3;
     TnBlockBody = 4;
