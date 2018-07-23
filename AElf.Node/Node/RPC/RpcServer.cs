@@ -19,6 +19,7 @@ using Newtonsoft.Json.Linq;
 using NLog;
 using AElf.ChainController;
 using Google.Protobuf.WellKnownTypes;
+using AElf.SmartContract;
 
 namespace AElf.Kernel.Node.RPC
 {
@@ -287,7 +288,19 @@ namespace AElf.Kernel.Node.RPC
                         {
                             ["TypeName"] = keyType.ToString(),
                             ["Value"] = byteValue
-                        });                        
+                        });
+                    case TypeName.Ulong:
+                        return JObject.FromObject(new JObject
+                        {
+                            ["TypeName"] = keyType.ToString(),
+                            ["Value"] = byteValue?.ToUInt64() ?? 0
+                        });
+                    case TypeName.Uint64Value:
+                        obj = JObject.FromObject(UInt64Value.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.TnHash:
+                        obj = JObject.FromObject(Hash.Parser.ParseFrom(byteValue));
+                        break;
                     case TypeName.TnBlockHeader:
                         obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
                         break;
@@ -311,6 +324,15 @@ namespace AElf.Kernel.Node.RPC
                         break;
                     case TypeName.TnChangesDict:
                         obj = JObject.FromObject(ChangesDict.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.SerializeFunctionMetadataMap:
+                        obj = JObject.FromObject(SerializeFunctionMetadataMap.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.SerializeContractMetadataTemplateMap:
+                        obj = JObject.FromObject(SerializeContractMetadataTemplateMap.Parser.ParseFrom(byteValue));
+                        break;
+                    case TypeName.CallingGraphEdges:
+                        obj = JObject.FromObject(CallingGraphEdges.Parser.ParseFrom(byteValue));
                         break;
                     default:
                         return JObject.FromObject(new JObject

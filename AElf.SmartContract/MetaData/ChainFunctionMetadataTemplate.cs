@@ -23,22 +23,22 @@ namespace AElf.SmartContract
     /// </summary>
     public class ChainFunctionMetadataTemplate : IChainFunctionMetadataTemplate
     {
-        public Dictionary<string, Dictionary<string, FunctionMetadataTemplate>> ContractMetadataTemplateMap { get; private set; } 
+        public Dictionary<string, Dictionary<string, FunctionMetadataTemplate>> ContractMetadataTemplateMap { get; private set; }
         public AdjacencyGraph<string, Edge<string>> CallingGraph; //calling graph is prepared for update contract code (check for DAG at that time)
-        
+
         private readonly ILogger _logger;
         private readonly IDataStore _dataStore;
-        public Hash ChainId { get;}
-        
+        public Hash ChainId { get; }
+
 
         public ChainFunctionMetadataTemplate(IDataStore dataStore, Hash chainId, ILogger logger)
         {
             _dataStore = dataStore;
             _logger = logger;
             ChainId = chainId;
-            
-            var mapCache = _dataStore.GetDataAsync(ResourcePath.CalculatePointerForMetadataTemplate(chainId)).Result;
-            var graphCache = _dataStore.GetDataAsync(ResourcePath.CalculatePointerForMetadataTemplateCallingGraph(chainId))
+
+            var mapCache = _dataStore.GetDataAsync(ResourcePath.CalculatePointerForMetadataTemplate(chainId), TypeName.SerializeContractMetadataTemplateMap).Result;
+            var graphCache = _dataStore.GetDataAsync(ResourcePath.CalculatePointerForMetadataTemplateCallingGraph(chainId), TypeName.CallingGraphEdges)
                 .Result;
             if (mapCache != null)
             {
@@ -75,16 +75,16 @@ namespace AElf.SmartContract
             {
                 ExtractRawMetadataFromType(contractType, out var smartContractReferenceMap,
                     out var localFunctionMetadataTemplateMap);
-                
+
                 //TODO: we group tx that send to the contract that contains no attributes into the same group
                 if (localFunctionMetadataTemplateMap.Count == 0 || localFunctionMetadataTemplateMap.First().Value.TemplateContainsMetadata == false)
                 {
                     ContractMetadataTemplateMap.Add(contractType.FullName, localFunctionMetadataTemplateMap);
                     return true;
                 }
-                
+
                 UpdateTemplate(contractType, smartContractReferenceMap, ref localFunctionMetadataTemplateMap);
-                
+
                 //merge the function metadata template map
                 ContractMetadataTemplateMap.Add(contractType.FullName, localFunctionMetadataTemplateMap);
             }
@@ -95,16 +95,16 @@ namespace AElf.SmartContract
             }
 
             //TODO: now each call of this will have large Disk IO because we replace the new whole map into the old map even if just minor changes to the map
-            await _dataStore.SetDataAsync(ResourcePath.CalculatePointerForMetadataTemplate(ChainId),
+            await _dataStore.SetDataAsync(ResourcePath.CalculatePointerForMetadataTemplate(ChainId), TypeName.SerializeContractMetadataTemplateMap,
                 GetSerializeContractMetadataTemplateMap().ToByteArray());
-            await _dataStore.SetDataAsync(ResourcePath.CalculatePointerForMetadataTemplateCallingGraph(ChainId),
+            await _dataStore.SetDataAsync(ResourcePath.CalculatePointerForMetadataTemplateCallingGraph(ChainId), TypeName.CallingGraphEdges,
                 GetSerializeCallingGraph().ToByteArray());
-            
+
             return true;
         }
 
-        
-        
+
+
 
         /// <summary>
         /// FunctionMetadataException will be thrown in following cases: 
@@ -118,7 +118,7 @@ namespace AElf.SmartContract
         /// <param name="smartContractReferenceMap"></param>
         /// <param name="localFunctionMetadataTemplateMap"></param>
         /// <exception cref="FunctionMetadataException"></exception>
-        private void ExtractRawMetadataFromType(Type contractType, out Dictionary<string, Type> smartContractReferenceMap, out Dictionary<string, FunctionMetadataTemplate> localFunctionMetadataTemplateMap )
+        private void ExtractRawMetadataFromType(Type contractType, out Dictionary<string, Type> smartContractReferenceMap, out Dictionary<string, FunctionMetadataTemplate> localFunctionMetadataTemplateMap)
         {
             var templocalFieldMap = new Dictionary<string, DataAccessMode>();
             smartContractReferenceMap = new Dictionary<string, Type>();
@@ -134,7 +134,7 @@ namespace AElf.SmartContract
                     throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Duplicate name of field attributes in contract " + contractType.FullName);
                 }
             }
-            
+
             //load smartContractReferenceMap: <"[contract_member_name]", Referenced contract type>
             foreach (var fieldInfo in contractType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
@@ -145,7 +145,7 @@ namespace AElf.SmartContract
                     throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Duplicate name of smart contract reference attributes in contract " + contractType.FullName);
                 }
             }
-            
+
             //load localFunctionMetadataTemplateMap: <"${[this]}.FunctionSignature", FunctionMetadataTemplate>
             //FunctionMetadataTemplate: <calling_set, local_resource_set>
             //calling_set: { "${[contract_member_name]}.[FunctionSignature]", ${this}.[FunctionSignature]... }
@@ -165,8 +165,8 @@ namespace AElf.SmartContract
                     }
                     return new Resource(resource, dataAccessMode);
                 });
-                
-                if (!localFunctionMetadataTemplateMap.TryAdd(functionAttribute.FunctionSignature, 
+
+                if (!localFunctionMetadataTemplateMap.TryAdd(functionAttribute.FunctionSignature,
                     new FunctionMetadataTemplate(new HashSet<string>(functionAttribute.CallingSet), new HashSet<Resource>(resourceSet))))
                 {
                     throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Duplicate name of function attribute" + functionAttribute.FunctionSignature + " in contract" + contractType.FullName);
@@ -175,7 +175,7 @@ namespace AElf.SmartContract
 
             if (localFunctionMetadataTemplateMap.Count == 0)
             {
-                var blackLists = new[] {"ToString", "Equals", "GetHashCode", "GetType"};
+                var blackLists = new[] { "ToString", "Equals", "GetHashCode", "GetType" };
                 foreach (var methodInfo in contractType.GetMethods())
                 {
                     if (!blackLists.Contains(methodInfo.Name))
@@ -187,7 +187,7 @@ namespace AElf.SmartContract
                 return;
                 throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + " no function marked in the target contract " + contractType.FullName);
             }
-            
+
             //check for validaty of the calling set (whether have unknow reference)
             foreach (var kvPair in localFunctionMetadataTemplateMap)
             {
@@ -235,9 +235,9 @@ namespace AElf.SmartContract
                 throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Calling graph of " + contractType.FullName + " is Non-DAG thus nothing take effect");
             }
 
-            
+
             List<Edge<string>> outEdgesToAdd = new List<Edge<string>>();
-            
+
             //check for unknown reference
             foreach (var kvPair in targetLocalFunctionMetadataTemplateMap)
             {
@@ -252,13 +252,13 @@ namespace AElf.SmartContract
                             referenceType.FullName);
                         if (!CallingGraph.ContainsVertex(globalCalledFunc))
                         {
-                            throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Unknow reference of the foreign target in edge <" + sourceFunc + ","+calledFunc+"> when trying to add contract " + contractType.FullName + " into calling graph, consider the target function does not exist in the foreign contract");
+                            throw new FunctionMetadataException("ChainId [" + ChainId.ToHex() + "] Unknow reference of the foreign target in edge <" + sourceFunc + "," + calledFunc + "> when trying to add contract " + contractType.FullName + " into calling graph, consider the target function does not exist in the foreign contract");
                         }
                         outEdgesToAdd.Add(new Edge<string>(sourceFunc, globalCalledFunc));
                     }
                 }
             }
-            
+
             //Merge local calling graph
             foreach (var localVertex in localCallGraph.Vertices)
             {
@@ -273,8 +273,8 @@ namespace AElf.SmartContract
             //add foreign edges
             CallingGraph.AddEdgeRange(outEdgesToAdd);
         }
-        
-        
+
+
         public bool TryGetLocalCallingGraph(Dictionary<string, FunctionMetadataTemplate> localFunctionMetadataTemplateMap, out AdjacencyGraph<string, Edge<string>> callGraph, out IEnumerable<string> topologicRes)
         {
             Ready();
@@ -283,7 +283,7 @@ namespace AElf.SmartContract
             {
                 callGraph.AddVertex(kvPair.Key);
                 foreach (var calledFunc in kvPair.Value.CallingSet)
-                { 
+                {
                     if (calledFunc.Contains(Replacement.This))
                     {
                         callGraph.AddVerticesAndEdge(new Edge<string>(kvPair.Key, calledFunc));
@@ -302,7 +302,7 @@ namespace AElf.SmartContract
                 topologicRes = null;
                 return false;
             }
-            
+
             return true;
         }
         #endregion
@@ -324,7 +324,7 @@ namespace AElf.SmartContract
 
             return serializeMap;
         }
-        
+
         private dynamic ReadFromSerializeContractMetadataTemplateMap(SerializeContractMetadataTemplateMap serializeMap)
         {
             var contractMetadataMap = new Dictionary<string, Dictionary<string, FunctionMetadataTemplate>>();
@@ -345,7 +345,7 @@ namespace AElf.SmartContract
         {
             var serializeCallingGraph = new CallingGraphEdges();
             serializeCallingGraph.Edges.AddRange(CallingGraph.Edges.Select(edge =>
-                new GraphEdge {Source = edge.Source, Target = edge.Target}));
+                new GraphEdge { Source = edge.Source, Target = edge.Target }));
             return serializeCallingGraph;
         }
 
@@ -379,14 +379,14 @@ namespace AElf.SmartContract
     {
         internal FunctionMetadataException(string msg) : base(msg)
         {
-            
+
         }
     }
 
     internal static class Replacement
     {
         private static string ReplacementRegexPattern = @"\$\{[a-zA-Z_][a-zA-Z0-9_]*((\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}";
-        
+
         public static readonly string This = "${this}";
 
         public static string ContractType(Type contractType)
@@ -405,12 +405,12 @@ namespace AElf.SmartContract
                 throw new InvalidParameterException("The input value: " + replacement + "is not a replacement");
             }
         }
-        
+
         public static string ReplaceValueIntoReplacement(string str, string replacement, string value)
         {
             return str.Replace(replacement, value);
         }
-        
+
         public static bool TryGetReplacementWithIndex(string str, int index, out string res)
         {
             var replacements = Regex.Matches(str, ReplacementRegexPattern);

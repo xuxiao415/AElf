@@ -13,19 +13,19 @@ namespace AElf.Kernel.Storages
             _keyValueDatabase = keyValueDatabase;
         }
 
-        public async Task SetDataAsync(Hash pointerHash, byte[] data)
+        public async Task SetDataAsync(Hash pointerHash, TypeName typeName, byte[] data)
         {
-            var key = pointerHash.GetKeyString(TypeName.Bytes);
+            var key = pointerHash.GetKeyString(typeName);
             await _keyValueDatabase.SetAsync(key, data);
         }
 
-        public async Task<byte[]> GetDataAsync(Hash pointerHash)
+        public async Task<byte[]> GetDataAsync(Hash pointerHash, TypeName typeName)
         {
             if (pointerHash == null)
             {
                 return null;
             }
-            var key = pointerHash.GetKeyString(TypeName.Bytes);
+            var key = pointerHash.GetKeyString(typeName);
             return await _keyValueDatabase.GetAsync(key, typeof(byte[]));
         }
     }
