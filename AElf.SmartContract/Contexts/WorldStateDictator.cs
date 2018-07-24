@@ -89,7 +89,7 @@ namespace AElf.SmartContract
 
             // make a path related to its order
             var key = CalculateKeyForPath(PreBlockHash, count);
-            await _dataStore.SetDataAsync(key, TypeName.Bytes, pathHash.GetHashBytes());
+            await _dataStore.SetDataAsync(key, TypeName.TnHash, pathHash.GetHashBytes());
 
             // update the count of changes
             count = new UInt64Value { Value = count.Value + 1 };
@@ -201,14 +201,14 @@ namespace AElf.SmartContract
         public async Task<Hash> GetChainLastBlockHash(Hash chainId)
         {
             var key = ResourcePath.CalculatePointerForLastBlockHash(chainId);
-            return await _dataStore.GetDataAsync(key,TypeName.Bytes);
+            return await _dataStore.GetDataAsync(key,TypeName.TnHash);
         }
 
         public async Task SetChainLastBlockHash(Hash chainId, Hash blockHash)
         {
             var key = ResourcePath.CalculatePointerForLastBlockHash(chainId);
             PreBlockHash = blockHash;
-            await _dataStore.SetDataAsync(key, TypeName.Bytes, blockHash.GetHashBytes());
+            await _dataStore.SetDataAsync(key, TypeName.TnHash, blockHash.GetHashBytes());
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace AElf.SmartContract
         /// <returns></returns>
         public async Task SetDataAsync(Hash pointerHash, byte[] data)
         {
-            await _dataStore.SetDataAsync(pointerHash, TypeName.Bytes, data);
+            await _dataStore.SetDataAsync(pointerHash, TypeName.TnHash, data);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace AElf.SmartContract
         /// <returns></returns>
         public async Task<byte[]> GetDataAsync(Hash pointerHash)
         {
-            return await _dataStore.GetDataAsync(pointerHash,TypeName.Bytes);
+            return await _dataStore.GetDataAsync(pointerHash,TypeName.TnHash);
         }
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace AElf.SmartContract
                 ResourcePath.CalculatePointerForGettingBlockHashByHeight(
                     header.ChainId,
                     height),
-                TypeName.Bytes,
+                TypeName.TnHash,
                 blockHash.ToByteArray());
         }
 

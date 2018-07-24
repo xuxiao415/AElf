@@ -97,7 +97,7 @@ namespace AElf.Kernel.Managers
         public async Task<Hash> GetChainLastBlockHash(Hash chainId)
         {
             var key = ResourcePath.CalculatePointerForLastBlockHash(chainId);
-            return await _dataStore.GetDataAsync(key,TypeName.Bytes);
+            return await _dataStore.GetDataAsync(key,TypeName.TnHash);
         }
 
         /// <inheritdoc/>
@@ -105,7 +105,7 @@ namespace AElf.Kernel.Managers
         {
             var key = ResourcePath.CalculatePointerForLastBlockHash(chainId);
             _worldStateDictator.PreBlockHash = blockHash;
-            await _dataStore.SetDataAsync(key, TypeName.Bytes, blockHash.GetHashBytes());
+            await _dataStore.SetDataAsync(key, TypeName.TnHash, blockHash.GetHashBytes());
         }
     }
 }
