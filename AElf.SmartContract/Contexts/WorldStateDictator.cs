@@ -330,7 +330,7 @@ namespace AElf.SmartContract
             for (ulong i = 0; i < changedPathsCount; i++)
             {
                 var key = CalculateKeyForPath(blockHash, new UInt64Value { Value = i });
-                var path = await _dataStore.GetDataAsync(key,TypeName.Bytes);
+                var path = await _dataStore.GetDataAsync(key,TypeName.TnHash);
                 paths.Add(path);
             }
 
@@ -420,7 +420,7 @@ namespace AElf.SmartContract
         {
             // The code chunk is copied from DataProvider
 
-            Hash prevBlockHash = await _dataStore.GetDataAsync(ResourcePath.CalculatePointerForLastBlockHash(chainId),TypeName.Bytes);
+            Hash prevBlockHash = await _dataStore.GetDataAsync(ResourcePath.CalculatePointerForLastBlockHash(chainId),TypeName.TnHash);
 
             //Generate the new pointer hash (using previous block hash)
             var pointerHashAfter = stateValueChange.Path.CalculateHashWith(prevBlockHash);
@@ -517,7 +517,7 @@ namespace AElf.SmartContract
 
             if (PreBlockHash == null)
             {
-                var hash = await _dataStore.GetDataAsync(ResourcePath.CalculatePointerForLastBlockHash(_chainId),TypeName.Bytes);
+                var hash = await _dataStore.GetDataAsync(ResourcePath.CalculatePointerForLastBlockHash(_chainId),TypeName.TnHash);
                 PreBlockHash = hash ?? Hash.Genesis;
             }
         }

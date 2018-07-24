@@ -266,7 +266,7 @@ namespace AElf.Kernel.Node.RPC
         {
             var sKey = reqParams["key"].ToString();
             var sValue = reqParams["value"].ToString();
-            
+
             var byteValue = new byte[sValue.Length / 2];
             for (var x = 0; x < byteValue.Length; x++)
             {
@@ -280,7 +280,7 @@ namespace AElf.Kernel.Node.RPC
             var obj = new JObject();
 
             try
-            {               
+            {
                 switch (keyType)
                 {
                     case TypeName.Bytes:
@@ -299,7 +299,18 @@ namespace AElf.Kernel.Node.RPC
                         obj = JObject.FromObject(UInt64Value.Parser.ParseFrom(byteValue));
                         break;
                     case TypeName.TnHash:
-                        obj = JObject.FromObject(Hash.Parser.ParseFrom(byteValue));
+                        try
+                        {
+                            obj = JObject.FromObject(Hash.Parser.ParseFrom(byteValue));
+                        }
+                        catch (Exception)
+                        {
+                            return JObject.FromObject(new JObject
+                            {
+                                ["TypeName"] = $"{keyType.ToString()}-ToHex",
+                                ["Value"] = byteValue.ToHex()
+                            });
+                        }
                         break;
                     case TypeName.TnBlockHeader:
                         obj = JObject.FromObject(BlockHeader.Parser.ParseFrom(byteValue));
@@ -339,9 +350,8 @@ namespace AElf.Kernel.Node.RPC
                         {
                             ["TypeName"] = keyType.ToString(),
                             ["Value"] = "Type name not found"
-                        });                       
+                        });
                 }
-
                 return JObject.FromObject(new JObject
                 {
                     ["TypeName"] = keyType.ToString(),
@@ -355,7 +365,7 @@ namespace AElf.Kernel.Node.RPC
                     ["TypeName"] = keyType.ToString(),
                     ["Value"] = e.ToString()
                 }); ;
-            }            
+            }
         }
 
         private async Task<JObject> ProGetBlockInfo(JObject reqParams)
@@ -404,12 +414,12 @@ namespace AElf.Kernel.Node.RPC
             };
             return JObject.FromObject(j);
         }
-        
+
 
         private Task<JObject> ProGetGenesisAddress(JObject reqParams)
         {
             var genesisHash = _node.GetGenesisContractHash();
-            Hash chainId = _node.ChainId;  
+            Hash chainId = _node.ChainId;
             JObject j = new JObject
             {
                 ["result"] = new JObject
@@ -418,7 +428,7 @@ namespace AElf.Kernel.Node.RPC
                     ["chain_id"] = chainId.ToHex()
                 }
             };
-            
+
             return Task.FromResult(JObject.FromObject(j));
         }
 
@@ -426,7 +436,7 @@ namespace AElf.Kernel.Node.RPC
         {
             string adr = reqParams["txhash"].ToString();
             Hash txHash;
-            
+
             try
             {
                 txHash = ByteArrayHelpers.FromHexString(adr);
@@ -438,7 +448,7 @@ namespace AElf.Kernel.Node.RPC
                     ["error"] = "Invalid Address Format"
                 });
             }
-            
+
             TransactionResult txResult = await _node.GetTransactionResult(txHash);
             var jobj = new JObject
             {
@@ -446,7 +456,7 @@ namespace AElf.Kernel.Node.RPC
                 ["tx_status"] = txResult.Status.ToString()
             };
 
-            
+
             if (txResult.Status == Status.Failed)
             {
                 jobj["tx_error"] = txResult.RetVal.ToStringUtf8();
@@ -457,20 +467,20 @@ namespace AElf.Kernel.Node.RPC
                 jobj["return"] = txResult.RetVal.ToByteArray().ToHex();
             }
             // Todo: it should be deserialized to obj ion cli, 
-            
-            
+
+
             JObject j = new JObject
             {
                 ["result"] = jobj
             };
-            
+
             return JObject.FromObject(j);
         }
 
         private async Task<JObject> ProcessGetIncrementId(JObject reqParams)
         {
             string adr = reqParams["address"].ToString();
-            
+
             Hash addr;
             try
             {
@@ -483,7 +493,7 @@ namespace AElf.Kernel.Node.RPC
                     ["error"] = "Invalid Address Format"
                 });
             }
-            
+
             ulong current = await _node.GetIncrementId(addr);
 
             JObject j = new JObject
@@ -510,7 +520,7 @@ namespace AElf.Kernel.Node.RPC
                 {
                     Value = ByteString.CopyFrom(ByteArrayHelpers.FromHexString(addr))
                 };
- 
+
                 var abi = await _node.GetContractAbi(addrHash);
                 j = new JObject
                 {
@@ -552,7 +562,7 @@ namespace AElf.Kernel.Node.RPC
             }
 
             j = new JObject { ["hash"] = t.GetHash().ToHex() };
-            
+
             return JObject.FromObject(j);
         }
 
@@ -567,7 +577,7 @@ namespace AElf.Kernel.Node.RPC
             byte[] txid = reqParams["txid"].ToObject<byte[]>();
             ITransaction tx = await _node.GetTransaction(txid);
 
-            var txInfo = tx == null ? new JObject {["tx"] = "Not Found"} : tx.GetTransactionInfo();
+            var txInfo = tx == null ? new JObject { ["tx"] = "Not Found" } : tx.GetTransactionInfo();
 
             return txInfo;
         }
@@ -586,9 +596,9 @@ namespace AElf.Kernel.Node.RPC
             JObject j = new JObject()
             {
                 ["result"] = new JObject
-                    {
-                        ["commands"] = arrCommands
-                    }
+                {
+                    ["commands"] = arrCommands
+                }
             };
 
             return JObject.FromObject(j);
@@ -606,6 +616,6 @@ namespace AElf.Kernel.Node.RPC
 
             await context.Response.WriteAsync(response.ToString(), Encoding.UTF8);
         }
-        
+
     }
 }
