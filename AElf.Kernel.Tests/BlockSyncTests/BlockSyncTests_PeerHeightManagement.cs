@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AElf.Kernel.Node.Protocol;
 using AElf.Network.Data;
+using AElf.Network.Data;
 using AElf.Network.Peers;
 using Xunit;
 

@@ -1,4 +1,4 @@
-﻿namespace AElf.Network.Connection
+﻿namespace AElf.Network.Message
 {
     public class PartialPacket
     {

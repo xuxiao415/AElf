@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using NLog;
 
-namespace AElf.Network.Connection
+namespace AElf.Network
 {
     public class IncomingConnectionArgs : EventArgs
     {

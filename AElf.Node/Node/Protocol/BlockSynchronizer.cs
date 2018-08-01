@@ -11,7 +11,6 @@ using AElf.Common.ByteArrayHelpers;
 using AElf.Kernel.Node.Protocol.Exceptions;
 using AElf.Kernel.Node.RPC.DTO;
 using AElf.Network;
-using AElf.Network.Connection;
 using AElf.Network.Data;
 using AElf.Network.Peers;
 using NLog;

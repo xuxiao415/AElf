@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using AElf.Network.Connection;
 using AElf.Network.Peers;
 using Moq;
 using Xunit;
@@ -14,10 +13,10 @@ namespace AElf.Network.Tests.NetworkManagerTests
         public void QueueTransactionRequest_RetryOnTimeout()
         {
             Mock<IPeer> firstPeer = new Mock<IPeer>();
-            firstPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message>()));
+            firstPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message.Message>()));
             
             Mock<IPeer> secondPeer = new Mock<IPeer>();
-            secondPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message>()));
+            secondPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message.Message>()));
             
             NetworkManager manager = new NetworkManager(null, null, null);
             manager.AddPeer(firstPeer.Object);
@@ -27,17 +26,17 @@ namespace AElf.Network.Tests.NetworkManagerTests
             manager.QueueTransactionRequest(txHash, firstPeer.Object);
             
             Thread.Sleep(manager.RequestTimeout + 100);
-            firstPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message>()), Times.Once());
+            firstPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message.Message>()), Times.Once());
             
             Thread.Sleep(manager.RequestTimeout + 100);
-            secondPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message>()), Times.Once());
+            secondPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message.Message>()), Times.Once());
         }
         
         [Fact]
         public void QueueTransactionRequest_TryAllPeers_ShouldThrowEx()
         {
             Mock<IPeer> firstPeer = new Mock<IPeer>();
-            firstPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message>()));
+            firstPeer.Setup(m => m.EnqueueOutgoing(It.IsAny<Message.Message>()));
             
             NetworkManager manager = new NetworkManager(null, null, null);
             
@@ -57,7 +56,7 @@ namespace AElf.Network.Tests.NetworkManagerTests
             // Wait for the request to timeout, the manager tests if it was the 
             // last try, if yes it throw the event.
             Thread.Sleep(manager.RequestTimeout + 100);
-            firstPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message>()), Times.Once());
+            firstPeer.Verify(mock => mock.EnqueueOutgoing(It.IsAny<Message.Message>()), Times.Once());
             
             Assert.Equal(1, receivedEvents.Count);
             RequestFailedArgs reqFailArgs = Assert.IsType<RequestFailedArgs>(receivedEvents[0]);

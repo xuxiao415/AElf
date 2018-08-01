@@ -4,18 +4,17 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Timers;
 using AElf.Common.ByteArrayHelpers;
 using AElf.Kernel;
 using AElf.Network.Config;
-using AElf.Network.Connection;
 using AElf.Network.Data;
+using AElf.Network.Peers;
 using AElf.Network.Peers.Exceptions;
 using Google.Protobuf;
 using NLog;
 
 [assembly:InternalsVisibleTo("AElf.Network.Tests")]
-namespace AElf.Network.Peers
+namespace AElf.Network
 {
     public class PeerAddedEventArgs : EventArgs
     {
@@ -30,13 +29,13 @@ namespace AElf.Network.Peers
     public class NetMessageReceivedArgs : EventArgs
     {
         public TimeoutRequest Request { get; set; }
-        public Message Message { get; set; }
+        public Message.Message Message { get; set; }
         public PeerMessageReceivedArgs PeerMessage { get; set; }
     }
 
     public class RequestFailedArgs : EventArgs
     {
-        public Message RequestMessage { get; set; }
+        public Message.Message RequestMessage { get; set; }
         
         public byte[] ItemHash { get; set; }
         public int BlockIndex { get; set; }
@@ -298,7 +297,7 @@ namespace AElf.Network.Peers
                     return;
             
                 BlockRequest br = new BlockRequest { Height = index };
-                Message message = NetRequestFactory.CreateMessage(MessageType.RequestBlock, br.ToByteArray()); 
+                Message.Message message = NetRequestFactory.CreateMessage(MessageType.RequestBlock, br.ToByteArray()); 
             
                 // Select peer for request
                 TimeoutRequest request = new TimeoutRequest(index, message, RequestTimeout);
@@ -682,7 +681,7 @@ namespace AElf.Network.Peers
                                 break;
                         }
 
-                        var resp = new Message
+                        var resp = new Message.Message
                         {
                             Type = (int)MessageType.Peers,
                             Length = 1,
@@ -726,7 +725,7 @@ namespace AElf.Network.Peers
             }
         }
 
-        internal TimeoutRequest HandleBlockMessage(Peer peer, Message msg)
+        internal TimeoutRequest HandleBlockMessage(Peer peer, Message.Message msg)
         {
             if (peer == null || msg == null)
             {
@@ -773,7 +772,7 @@ namespace AElf.Network.Peers
             }
         }
 
-        internal TimeoutRequest HandleTransactionMessage(Peer peer, Message msg)
+        internal TimeoutRequest HandleTransactionMessage(Peer peer, Message.Message msg)
         {
             if (peer == null || msg == null)
             {
@@ -833,7 +832,7 @@ namespace AElf.Network.Peers
 
             try
             {
-                Message packet = NetRequestFactory.CreateMessage(messageType, payload);
+                Message.Message packet = NetRequestFactory.CreateMessage(messageType, payload);
                 return BroadcastMessage(packet);
             }
             catch (Exception e)
@@ -843,7 +842,7 @@ namespace AElf.Network.Peers
             }
         }
 
-        public int BroadcastMessage(Message message)
+        public int BroadcastMessage(Message.Message message)
         {
             if (_peers == null || !_peers.Any())
                 return 0;

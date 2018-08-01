@@ -2,28 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using AElf.Common.ByteArrayHelpers;
 using AElf.Network.Data;
+using AElf.Network.DataStream;
 using AElf.Network.Exceptions;
-using Google.Protobuf;
 using NLog;
 
-namespace AElf.Network.Connection
+namespace AElf.Network.Message
 {
-    public class PacketReceivedEventArgs : EventArgs
-    {
-        public Message Message { get; set; }
-    }
-    
     public class MessageReader : IMessageReader
     {   
         private const int IntLength = 4;
 
         private ILogger _logger;
         
-        private readonly NetworkStream _stream;
+        private readonly INetworkStream _stream;
 
         public event EventHandler PacketReceived;
         public event EventHandler StreamClosed;
@@ -32,7 +26,7 @@ namespace AElf.Network.Connection
 
         public bool IsConnected { get; private set; }
         
-        public MessageReader(NetworkStream stream)
+        public MessageReader(INetworkStream stream)
         {
             _partialPacketBuffer = new List<PartialPacket>();
             
@@ -62,48 +56,20 @@ namespace AElf.Network.Connection
                     // Is this a partial reception ?
                     bool isBuffered = await ReadBoolean();
 
-                    // Read the size of the data
-                    int length = await ReadInt();
-
+                    Message message;
+                    
                     if (isBuffered)
                     {
-                        // If it's a partial packet read the packet info
-                        PartialPacket partialPacket = await ReadPartialPacket(length);
-
-                        // todo property control
-
-                        if (!partialPacket.IsEnd)
-                        {
-                            _partialPacketBuffer.Add(partialPacket);
-                            _logger.Trace($"Received packet : {(MessageType)type}, length : {length}");
-                        }
-                        else
-                        {
-                            // This is the last packet
-                            // Concat all data 
-
-                            _partialPacketBuffer.Add(partialPacket);
-
-                            byte[] allData =
-                                ByteArrayHelpers.Combine(_partialPacketBuffer.Select(pp => pp.Data).ToArray());
-
-                            _logger.Trace($"Received last packet : {_partialPacketBuffer.Count}, total length : {allData.Length}");
-
-                            // Clear the buffer for the next partial to receive 
-                            _partialPacketBuffer.Clear();
-
-                            Message message = new Message {Type = type, Length = allData.Length, Payload = allData};
-                            FireMessageReceivedEvent(message);
-                        }
+                        message = await ReadBufferedMessage(type);
                     }
                     else
                     {
-                        // If it's not a partial packet the next "length" bytes should be 
-                        // the entire data
-
-                        byte[] packetData = await ReadBytesAsync(length);
-
-                        Message message = new Message {Type = type, Length = length, Payload = packetData};
+                        message = await ReadMessage(type);
+                    }
+                    
+                    if (message != null)
+                    {
+                        _logger.Trace($"Received message, type : {(MessageType)type}, length : {message.Length} bytes.");
                         FireMessageReceivedEvent(message);
                     }
                 }
@@ -139,21 +105,71 @@ namespace AElf.Network.Connection
             PacketReceived?.Invoke(this, args);
         }
 
+        private async Task<Message> ReadMessage(int type)
+        {
+            // Read the size of the data
+            int length = await ReadInt();
+            
+            // If it's not a partial packet the next "length" bytes should be 
+            // the entire data
+
+            byte[] packetData = await _stream.ReadBytesAsync(length);
+
+            Message message = new Message { Type = type, Length = length, Payload = packetData };
+
+            return message;
+        }
+
+        private async Task<Message> ReadBufferedMessage(int type)
+        {
+            // Read the size of the data
+            int length = await ReadInt();
+            
+            // If it's a partial packet read the packet info
+            PartialPacket partialPacket = await ReadPartialPacket(length);
+
+            // todo property control
+
+            if (!partialPacket.IsEnd)
+            {
+                _partialPacketBuffer.Add(partialPacket);
+                _logger.Trace($"Received message part : { (MessageType) type }, length : { length }");
+                
+                // If only partial reception return no message
+                return null;
+            }
+            
+            // This is the last packet
+            // Concat all data 
+
+            _partialPacketBuffer.Add(partialPacket);
+
+            byte[] allData =
+                ByteArrayHelpers.Combine(_partialPacketBuffer.Select(pp => pp.Data).ToArray());
+
+            _logger.Trace($"Received last message part : { _partialPacketBuffer.Count }, total length : { allData.Length }");
+
+            // Clear the buffer for the next partial to receive 
+            _partialPacketBuffer.Clear();
+
+            return new Message { Type = type, Length = allData.Length, Payload = allData };
+        }
+
         private async Task<int> ReadByte()
         {
-            byte[] type = await ReadBytesAsync(1);
+            byte[] type = await _stream.ReadBytesAsync(1);
             return type[0];
         }
 
         private async Task<int> ReadInt()
         {
-            byte[] intBytes = await ReadBytesAsync(IntLength);
+            byte[] intBytes = await _stream.ReadBytesAsync(IntLength);
             return BitConverter.ToInt32(intBytes, 0);
         }
 
         private async Task<bool> ReadBoolean()
         {
-            byte[] isBuffered = await ReadBytesAsync(1);
+            byte[] isBuffered = await _stream.ReadBytesAsync(1);
             return isBuffered[0] != 0;
         }
 
@@ -166,41 +182,12 @@ namespace AElf.Network.Connection
             partialPacket.TotalDataSize = await ReadInt();
             
             // Read the data
-            byte[] packetData = await ReadBytesAsync(dataLength);
+            byte[] packetData = await _stream.ReadBytesAsync(dataLength);
             partialPacket.Data = packetData;
             
             return partialPacket;
         }
         
-        /// <summary>
-        /// Reads bytes from the stream.
-        /// </summary>
-        /// <param name="amount">The amount of bytes we want to read.</param>
-        /// <returns>The read bytes.</returns>
-        protected async Task<byte[]> ReadBytesAsync(int amount)
-        {
-            if (amount == 0)
-            {
-                _logger.Trace("Read amount is 0");
-                return new byte[0];
-            }
-            
-            byte[] requestedBytes = new byte[amount];
-            
-            int receivedIndex = 0;
-            while (receivedIndex < amount)
-            {
-                int readAmount = await _stream.ReadAsync(requestedBytes, receivedIndex, amount - receivedIndex);
-                
-                if (readAmount == 0)
-                    throw new PeerDisconnectedException();
-                
-                receivedIndex += readAmount;
-            }
-            
-            return requestedBytes;
-        }
-
         #region Closing and disposing
 
         public void Close()

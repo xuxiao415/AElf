@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using AElf.Network.Connection;
 using AElf.Network.Data;
+using AElf.Network.Data;
+using AElf.Network.DataStream;
+using AElf.Network.Message;
 using Google.Protobuf;
 using NLog;
 
@@ -10,7 +12,7 @@ namespace AElf.Network.Peers
 {
     public class MessageReceivedArgs : EventArgs
     {
-        public Message Message { get; set; }
+        public Message.Message Message { get; set; }
         public Peer Peer { get; set; }
     }
     
@@ -30,7 +32,7 @@ namespace AElf.Network.Peers
     public class PeerMessageReceivedArgs : EventArgs
     {
         public Peer Peer { get; set; }
-        public Message Message { get; set; }
+        public Message.Message Message { get; set; }
     }
     
     /// <summary>
@@ -136,7 +138,8 @@ namespace AElf.Network.Peers
             
                 var stream = client.GetStream();
             
-                MessageReader reader = new MessageReader(stream);
+                NetDataStream nds = new NetDataStream(stream);
+                MessageReader reader = new MessageReader(nds);
                 _messageReader = reader;
             
                 MessageWriter writer = new MessageWriter(stream);
@@ -168,7 +171,7 @@ namespace AElf.Network.Peers
             var nd = new NodeData {Port = _port};
             byte[] packet = nd.ToByteArray();
             
-            _messageWriter.EnqueueMessage(new Message { Type = (int)MessageType.Auth, Length = packet.Length, Payload = packet});
+            _messageWriter.EnqueueMessage(new Message.Message { Type = (int)MessageType.Auth, Length = packet.Length, Payload = packet});
         }
 
         private async void MessageReaderOnStreamClosed(object sender, EventArgs eventArgs)
@@ -218,7 +221,7 @@ namespace AElf.Network.Peers
 
         // Async response to the connection, when a node connects both sides are 
         // waiting for this to consider the peer usable.
-        private void HandleAuthResponse(Message aMessage)
+        private void HandleAuthResponse(Message.Message aMessage)
         {
             NodeData n = NodeData.Parser.ParseFrom(aMessage.Payload);
             
@@ -235,7 +238,7 @@ namespace AElf.Network.Peers
             PeerAuthentified?.Invoke(this, EventArgs.Empty);
         }
 
-        private void FireMessageReceived(Message p)
+        private void FireMessageReceived(Message.Message p)
         {
             MessageReceived?.Invoke(this, new PeerMessageReceivedArgs { Peer = this, Message = p });
         }
@@ -245,7 +248,7 @@ namespace AElf.Network.Peers
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public void EnqueueOutgoing(Message msg)
+        public void EnqueueOutgoing(Message.Message msg)
         {
             if (_messageWriter == null)
             {

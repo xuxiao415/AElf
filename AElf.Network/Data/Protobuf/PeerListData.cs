@@ -1,5 +1,6 @@
 ﻿using System.Text;
 
+// ReSharper disable once CheckNamespace
 namespace AElf.Network.Data
 {
     public partial class PeerListData

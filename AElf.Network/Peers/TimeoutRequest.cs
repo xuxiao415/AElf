@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
-using AElf.Network.Connection;
 
 namespace AElf.Network.Peers
 {
@@ -23,7 +22,7 @@ namespace AElf.Network.Peers
         private readonly Timer _timeoutTimer;
         
         public IPeer Peer { get; private set; }
-        public Message RequestMessage { get; }
+        public Message.Message RequestMessage { get; }
         
         public byte[] ItemHash { get; private set; }
         public int BlockIndex { get; private set; }
@@ -38,7 +37,7 @@ namespace AElf.Network.Peers
             get { return RetryCount >= MaxRetryCount; }
         }
 
-        private TimeoutRequest(Message msg, double timeout)
+        private TimeoutRequest(Message.Message msg, double timeout)
         {
             RequestMessage = msg;
             
@@ -48,13 +47,13 @@ namespace AElf.Network.Peers
             _timeoutTimer.AutoReset = false;
         }
 
-        public TimeoutRequest(byte[] itemHash, Message msg, double timeout)
+        public TimeoutRequest(byte[] itemHash, Message.Message msg, double timeout)
             : this(msg, timeout)
         {
             ItemHash = itemHash;
         }
         
-        public TimeoutRequest(int index, Message msg, double timeout)
+        public TimeoutRequest(int index, Message.Message msg, double timeout)
             : this(msg, timeout)
         {
             BlockIndex = index;

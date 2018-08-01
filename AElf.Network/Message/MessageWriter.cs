@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AElf.Common.ByteArrayHelpers;
 using NLog;
 
-namespace AElf.Network.Connection
+namespace AElf.Network.Message
 {
     /// <summary>
     /// This class performs writes to the underlying tcp stream.

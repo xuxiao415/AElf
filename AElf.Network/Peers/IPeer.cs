@@ -1,5 +1,5 @@
 ﻿using System;
-using AElf.Network.Connection;
+using AElf.Network.Data;
 using AElf.Network.Data;
 
 namespace AElf.Network.Peers
@@ -18,7 +18,7 @@ namespace AElf.Network.Peers
         bool IsConnected { get; }
         bool IsListening { get; }
         
-        void EnqueueOutgoing(Message msg);
+        void EnqueueOutgoing(Message.Message msg);
 
         void Disconnect();
     }

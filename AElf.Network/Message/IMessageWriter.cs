@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AElf.Network.Connection
+namespace AElf.Network.Message
 {
     public interface IMessageWriter : IDisposable
     {

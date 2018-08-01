@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace AElf.Network.Connection
+namespace AElf.Network
 {
     public interface IConnectionListener : IDisposable
     {

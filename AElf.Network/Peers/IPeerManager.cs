@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using AElf.Network.Data;
+using AElf.Network.Data;
 
 namespace AElf.Network.Peers
 {

@@ -1,4 +1,5 @@
 ﻿using AElf.Network.Data;
+using AElf.Network.Data;
 using Xunit;
 
 namespace AElf.Network.Tests

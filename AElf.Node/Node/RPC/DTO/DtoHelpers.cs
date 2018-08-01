@@ -1,6 +1,7 @@
 ﻿using System;
 using AElf.Common.ByteArrayHelpers;
 using AElf.Network.Data;
+using AElf.Network.Data;
 using AElf.Node.RPC.DTO;
 using Google.Protobuf;
 using Newtonsoft.Json.Linq;
