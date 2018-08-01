@@ -1,6 +1,5 @@
 ﻿using AElf.Network;
 using AElf.Network.Config;
-using AElf.Network.Connection;
 using AElf.Network.Data;
 using AElf.Network.Peers;
 using Autofac;

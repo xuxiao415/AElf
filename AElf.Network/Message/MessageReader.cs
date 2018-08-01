@@ -14,6 +14,7 @@ namespace AElf.Network.Message
     public class MessageReader : IMessageReader
     {   
         private const int IntLength = 4;
+        private const int BooleanLength = 1;
 
         private ILogger _logger;
         
@@ -70,6 +71,7 @@ namespace AElf.Network.Message
                     if (message != null)
                     {
                         _logger.Trace($"Received message, type : {(MessageType)type}, length : {message.Length} bytes.");
+                        
                         FireMessageReceivedEvent(message);
                     }
                 }
@@ -91,8 +93,6 @@ namespace AElf.Network.Message
                 }
 
                 Close();
-                
-                _logger.Trace(e, "[Message reader] Connection was aborted.\n");
                 
                 StreamClosed?.Invoke(this, EventArgs.Empty);
             }
@@ -129,23 +129,24 @@ namespace AElf.Network.Message
             PartialPacket partialPacket = await ReadPartialPacket(length);
 
             // todo property control
+            // todo Contiguous position in the list - keep track of last index
 
             if (!partialPacket.IsEnd)
             {
                 _partialPacketBuffer.Add(partialPacket);
-                _logger.Trace($"Received message part : { (MessageType) type }, length : { length }");
+                _logger.Trace($"Received message part : {(MessageType) type}, position : {partialPacket.Position}, length : {length}");
                 
                 // If only partial reception return no message
                 return null;
             }
             
-            // This is the last packet
-            // Concat all data 
+            // This is the last packet: concat all data 
 
             _partialPacketBuffer.Add(partialPacket);
 
-            byte[] allData =
-                ByteArrayHelpers.Combine(_partialPacketBuffer.Select(pp => pp.Data).ToArray());
+            byte[] allData = ByteArrayHelpers.Combine(_partialPacketBuffer.Select(pp => pp.Data).ToArray());
+            
+            // todo test total data size
 
             _logger.Trace($"Received last message part : { _partialPacketBuffer.Count }, total length : { allData.Length }");
 
@@ -169,7 +170,7 @@ namespace AElf.Network.Message
 
         private async Task<bool> ReadBoolean()
         {
-            byte[] isBuffered = await _stream.ReadBytesAsync(1);
+            byte[] isBuffered = await _stream.ReadBytesAsync(BooleanLength);
             return isBuffered[0] != 0;
         }
 

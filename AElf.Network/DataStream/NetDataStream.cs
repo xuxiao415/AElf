@@ -20,7 +20,7 @@ namespace AElf.Network.DataStream
         /// <returns>The read bytes.</returns>
         public async Task<byte[]> ReadBytesAsync(int amount)
         {
-            if (amount == 0)
+            if (amount <= 0)
                 return new byte[0];
             
             byte[] requestedBytes = new byte[amount];
