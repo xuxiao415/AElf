@@ -5,7 +5,7 @@ namespace AElf.Network.Message
     public interface IMessageReader : IDisposable
     {
         event EventHandler PacketReceived;
-        event EventHandler StreamClosed;
+        event EventHandler ReadingStopped;
         
         void Start();
         void Close();

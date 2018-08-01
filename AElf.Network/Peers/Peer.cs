@@ -146,7 +146,7 @@ namespace AElf.Network.Peers
                 _messageWriter = writer;
                 
                 _messageReader.PacketReceived += ClientOnPacketReceived;
-                _messageReader.StreamClosed += MessageReaderOnStreamClosed;
+                _messageReader.ReadingStopped += MessageReaderOnStreamClosed;
             
                 _messageReader.Start(); 
                 _messageWriter.Start();
@@ -300,7 +300,7 @@ namespace AElf.Network.Peers
             if (_messageReader != null)
             {
                 _messageReader.PacketReceived -= ClientOnPacketReceived;
-                _messageReader.StreamClosed -= MessageReaderOnStreamClosed;
+                _messageReader.ReadingStopped -= MessageReaderOnStreamClosed;
             }
 
             Dispose();

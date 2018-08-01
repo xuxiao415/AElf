@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AElf.Common.ByteArrayHelpers;
 using AElf.Network.Data;
@@ -9,21 +11,36 @@ using AElf.Network.DataStream;
 using AElf.Network.Exceptions;
 using NLog;
 
+[assembly:InternalsVisibleTo("AElf.Network.Tests.MessageTests")]
 namespace AElf.Network.Message
 {
+    public class ReadingStoppedArgs : EventArgs
+    {
+        public Exception Exception { get; set; }
+
+        public string Message
+        {
+            get { return Exception?.Message; }
+        }
+    }
+    
     public class MessageReader : IMessageReader
-    {   
-        private const int IntLength = 4;
-        private const int BooleanLength = 1;
+    {
+        public const int DefaultMaxMessageSize = 1024 * 1024; // 1 MiB
+        
+        public const int IntLength = 4;
+        public const int BooleanLength = 1;
 
         private ILogger _logger;
         
         private readonly INetworkStream _stream;
 
         public event EventHandler PacketReceived;
-        public event EventHandler StreamClosed;
+        public event EventHandler ReadingStopped;
 
         private readonly List<PartialPacket> _partialPacketBuffer;
+
+        public int MaxMessageSize { get; set; } = DefaultMaxMessageSize;
 
         public bool IsConnected { get; private set; }
         
@@ -45,7 +62,7 @@ namespace AElf.Network.Message
         /// <summary>
         /// Reads the bytes from the stream.
         /// </summary>
-        private async Task Read()
+        internal async Task Read()
         {
             try
             {
@@ -78,9 +95,7 @@ namespace AElf.Network.Message
             }
             catch (PeerDisconnectedException e)
             {
-                _logger.Trace(e, "Connection was aborted.\n");
-                StreamClosed?.Invoke(this, EventArgs.Empty);
-                
+                ReadingStopped?.Invoke(this, new ReadingStoppedArgs { Exception = e});
                 Close();
             }
             catch (Exception e)
@@ -94,7 +109,7 @@ namespace AElf.Network.Message
 
                 Close();
                 
-                StreamClosed?.Invoke(this, EventArgs.Empty);
+                ReadingStopped?.Invoke(this, new ReadingStoppedArgs { Exception = e});
             }
         }
 
@@ -109,6 +124,10 @@ namespace AElf.Network.Message
         {
             // Read the size of the data
             int length = await ReadInt();
+            
+            if (length > MaxMessageSize)
+                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
+                                                     $"accepted size ({MaxMessageSize} bytes). Size : {length} bytes.");
             
             // If it's not a partial packet the next "length" bytes should be 
             // the entire data
