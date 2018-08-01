@@ -1,6 +1,6 @@
 ﻿namespace AElf.Network.Message
 {
-    public class PartialPacket
+    public class PartialMessage
     {
         public int Type { get; set; }
         public int Position { get; set; }

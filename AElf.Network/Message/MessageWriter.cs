@@ -75,7 +75,7 @@ namespace AElf.Network.Message
                         if (lastPacketSize != 0)
                             packetCount++;
 
-                        List<PartialPacket> partials = new List<PartialPacket>();
+                        List<PartialMessage> partials = new List<PartialMessage>();
 
                         int currentIndex = 0;
                         for (int i = 0; i < packetCount - 1; i++)
@@ -84,7 +84,7 @@ namespace AElf.Network.Message
                             
                             Array.Copy(p.Payload, currentIndex, slice, 0, MaxOutboundPacketSize);
                             
-                            var partial = new PartialPacket 
+                            var partial = new PartialMessage 
                             {
                                 Type = p.Type, Position = i, IsEnd = false, TotalDataSize = p.Payload.Length, Data = slice
                             };
@@ -97,7 +97,7 @@ namespace AElf.Network.Message
                         byte[] endSlice = new byte[lastPacketSize];
                         Array.Copy(p.Payload, currentIndex, endSlice, 0, lastPacketSize);
                         
-                        var endPartial = new PartialPacket 
+                        var endPartial = new PartialMessage 
                         {
                             Type = p.Type, Position = packetCount-1, IsEnd = true, TotalDataSize = p.Payload.Length, Data = endSlice
                         };
@@ -135,7 +135,7 @@ namespace AElf.Network.Message
             _stream.Write(b, 0, b.Length);
         }
 
-        internal void SendPartialPacket(PartialPacket p)
+        internal void SendPartialPacket(PartialMessage p)
         {
             byte[] type = { (byte)p.Type };
             byte[] isbuffered = { 1 };

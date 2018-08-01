@@ -17,11 +17,6 @@ namespace AElf.Network.Message
     public class ReadingStoppedArgs : EventArgs
     {
         public Exception Exception { get; set; }
-
-        public string Message
-        {
-            get { return Exception?.Message; }
-        }
     }
     
     public class MessageReader : IMessageReader
@@ -38,7 +33,8 @@ namespace AElf.Network.Message
         public event EventHandler PacketReceived;
         public event EventHandler ReadingStopped;
 
-        private readonly List<PartialPacket> _partialPacketBuffer;
+        private readonly List<PartialMessage> _partialMessageBuffer;
+        private int _partialMessageCurrentSize = 0;
 
         public int MaxMessageSize { get; set; } = DefaultMaxMessageSize;
 
@@ -46,8 +42,7 @@ namespace AElf.Network.Message
         
         public MessageReader(INetworkStream stream)
         {
-            _partialPacketBuffer = new List<PartialPacket>();
-            
+            _partialMessageBuffer = new List<PartialMessage>();
             _stream = stream;
         }
         
@@ -93,7 +88,7 @@ namespace AElf.Network.Message
                     }
                 }
             }
-            catch (PeerDisconnectedException e)
+            catch (StreamStoppedException e)
             {
                 ReadingStopped?.Invoke(this, new ReadingStoppedArgs { Exception = e});
                 Close();
@@ -144,16 +139,20 @@ namespace AElf.Network.Message
             // Read the size of the data
             int length = await ReadInt();
             
+            if (length > MaxMessageSize)
+                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
+                                                     $"accepted size ({MaxMessageSize} bytes). Size : {length} bytes.");
+            
             // If it's a partial packet read the packet info
-            PartialPacket partialPacket = await ReadPartialPacket(length);
+            PartialMessage partialMessage = await ReadPartialPacket(length);
 
             // todo property control
             // todo Contiguous position in the list - keep track of last index
 
-            if (!partialPacket.IsEnd)
+            if (!partialMessage.IsEnd)
             {
-                _partialPacketBuffer.Add(partialPacket);
-                _logger.Trace($"Received message part : {(MessageType) type}, position : {partialPacket.Position}, length : {length}");
+                _partialMessageBuffer.Add(partialMessage);
+                _logger.Trace($"Received message part : {(MessageType) type}, position : {partialMessage.Position}, length : {length}");
                 
                 // If only partial reception return no message
                 return null;
@@ -161,18 +160,21 @@ namespace AElf.Network.Message
             
             // This is the last packet: concat all data 
 
-            _partialPacketBuffer.Add(partialPacket);
+            _partialMessageBuffer.Add(partialMessage);
 
-            byte[] allData = ByteArrayHelpers.Combine(_partialPacketBuffer.Select(pp => pp.Data).ToArray());
-            
-            // todo test total data size
+            byte[] allData = ByteArrayHelpers.Combine(_partialMessageBuffer.Select(pp => pp.Data).ToArray());
 
-            _logger.Trace($"Received last message part : { _partialPacketBuffer.Count }, total length : { allData.Length }");
+            _logger.Trace($"Received last message part : { _partialMessageBuffer.Count }, total length : { allData.Length }");
 
-            // Clear the buffer for the next partial to receive 
-            _partialPacketBuffer.Clear();
+            ResetBufferedMessageState();
 
             return new Message { Type = type, Length = allData.Length, Payload = allData };
+        }
+
+        private void ResetBufferedMessageState()
+        {
+            _partialMessageBuffer.Clear();
+            _partialMessageCurrentSize = 0;
         }
 
         private async Task<int> ReadByte()
@@ -193,19 +195,23 @@ namespace AElf.Network.Message
             return isBuffered[0] != 0;
         }
 
-        private async Task<PartialPacket> ReadPartialPacket(int dataLength)
+        private async Task<PartialMessage> ReadPartialPacket(int dataLength)
         {
-            PartialPacket partialPacket = new PartialPacket();
+            PartialMessage partialMessage = new PartialMessage();
 
-            partialPacket.Position = await ReadInt();
-            partialPacket.IsEnd = await ReadBoolean();
-            partialPacket.TotalDataSize = await ReadInt();
+            partialMessage.Position = await ReadInt();
+            partialMessage.IsEnd = await ReadBoolean();
+            partialMessage.TotalDataSize = await ReadInt();
+            
+            if (partialMessage.TotalDataSize > MaxMessageSize)
+                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
+                                                     $"accepted size ({MaxMessageSize} bytes). Size : {partialMessage.TotalDataSize} bytes.");
             
             // Read the data
             byte[] packetData = await _stream.ReadBytesAsync(dataLength);
-            partialPacket.Data = packetData;
+            partialMessage.Data = packetData;
             
-            return partialPacket;
+            return partialMessage;
         }
         
         #region Closing and disposing

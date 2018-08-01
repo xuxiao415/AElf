@@ -31,7 +31,7 @@ namespace AElf.Network.DataStream
                 int readAmount = await _stream.ReadAsync(requestedBytes, receivedIndex, amount - receivedIndex);
                 
                 if (readAmount == 0)
-                    throw new PeerDisconnectedException();
+                    throw new StreamStoppedException("The end of the stream has been detected.");
                 
                 receivedIndex += readAmount;
             }
