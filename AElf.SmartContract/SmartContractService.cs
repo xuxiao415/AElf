@@ -29,11 +29,7 @@ namespace AElf.SmartContract
 
         private ConcurrentBag<IExecutive> GetPoolFor(Hash account)
         {
-            if (!_executivePools.TryGetValue(account, out var pool))
-            {
-                pool = new ConcurrentBag<IExecutive>();
-                _executivePools[account] = pool;
-            }
+            var pool = _executivePools.GetOrAdd(account, new ConcurrentBag<IExecutive>());
             return pool;
         }
 
@@ -41,7 +37,10 @@ namespace AElf.SmartContract
         {
             var pool = GetPoolFor(account);
             if (pool.TryTake(out var executive))
+            {
+                executive.SetDataCache(new Dictionary<Hash, StateCache>());
                 return executive;
+            }
 
             // get registration
             var reg = await _smartContractManager.GetAsync(account);
@@ -78,6 +77,7 @@ namespace AElf.SmartContract
         public async Task PutExecutiveAsync(Hash account, IExecutive executive)
         {
             // TODO: Maybe reset TransactionContext
+            executive.SetDataCache(new Dictionary<Hash, StateCache>());
             GetPoolFor(account).Add(executive);
             await Task.CompletedTask;
         }
