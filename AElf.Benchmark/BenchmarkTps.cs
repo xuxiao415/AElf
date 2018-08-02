@@ -289,30 +289,6 @@ namespace AElf.Benchmark
         public async Task InitContract(Hash contractAddr, IEnumerable<Hash> addrBook)
         {
             //init contract
-            string name = "TestToken" + _incrementId;
-            var txnInit = new Transaction
-            {
-                From = Hash.Zero.ToAccount(),
-                To = contractAddr,
-                IncrementId = NewIncrementId(),
-                MethodName = "Initialize",
-                Params = ByteString.CopyFrom(ParamsPacker.Pack(name, Hash.Zero.ToAccount()))
-            };
-            
-            var txnInitCtxt = new TransactionContext()
-            {
-                Transaction = txnInit
-            };
-            var executiveUser = await _smartContractService.GetExecutiveAsync(contractAddr, ChainId);
-            try
-            {
-                await executiveUser.SetTransactionContext(txnInitCtxt).Apply(true);
-            }
-            finally
-            {
-                await _smartContractService.PutExecutiveAsync(contractAddr, executiveUser);    
-            }
-            //init contract
             var initTxList = new List<ITransaction>();
             foreach (var addr in addrBook)
             {
