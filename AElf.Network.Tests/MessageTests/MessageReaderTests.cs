@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AElf.Common.ByteArrayHelpers;
 using AElf.Network.DataStream;
 using AElf.Network.Exceptions;
 using AElf.Network.Message;
@@ -12,6 +13,72 @@ namespace AElf.Network.Tests.MessageTests
 {
     public class MessageReaderTests
     {
+        #region Helpers
+
+        public class MessageByteFields
+        {
+            public byte[] Type { get; set; }
+            public byte[] IsBuffered { get; set; }
+            public byte[] Size { get; set; }
+            public byte[] Data { get; set; }
+            
+            public byte[] Position { get; set; }
+            public byte[] IsEnd { get; set; }
+            public byte[] TotalLength { get; set; }
+            
+        }
+
+        public MessageByteFields CreateMessage(int type, int size, 
+            bool isBuffered = false, int position = 0, bool isEnd = false, int totalLength = 0)
+        {
+            var msg = new MessageByteFields
+            {
+                Type = new[] { (byte)type },
+                IsBuffered = new[] { (byte)(isBuffered ? 1 : 0) },
+                Size = BitConverter.GetBytes(size),
+                Data = ByteArrayHelpers.RandomFill(size)
+            };
+
+            if (isBuffered)
+            {
+                msg.Position = BitConverter.GetBytes(position);
+                msg.IsEnd = new[] {(byte) (isEnd ? 1 : 0)};
+                msg.TotalLength = BitConverter.GetBytes(totalLength);
+            }
+
+            return msg;
+        }
+        
+        #endregion
+        
+        #region Smoke Test
+
+        [Fact]
+        public async Task Read_BasicSmokeTest_Message()
+        {
+            Mock<INetworkStream> networkStream = new Mock<INetworkStream>();
+
+        }
+        
+        [Fact]
+        public async Task Read_BasicSmokeTest_BufferedMessage()
+        {
+            
+        }
+
+        #endregion Smoke Test
+
+        #region Reading stopped tests
+        
+        public TExType AssertReadingStoppedException<TExType>(List<EventArgs> receivedEvents) where TExType : Exception 
+        {
+            Assert.Equal(1, receivedEvents.Count);
+            ReadingStoppedArgs readingStoppedArgs = Assert.IsType<ReadingStoppedArgs>(receivedEvents[0]);
+            
+            TExType protocolError = Assert.IsType<TExType>(readingStoppedArgs.Exception);
+            return protocolError;
+        }
+
         [Fact]
         public async Task Read_DistantClosed_StopReading()
         {
@@ -33,15 +100,7 @@ namespace AElf.Network.Tests.MessageTests
             StreamStoppedException ex = AssertReadingStoppedException<StreamStoppedException>(receivedEvents);
             
             Assert.Equal(ex.Message, $"The end of the stream has been detected.");
-        }
-
-        public TExType AssertReadingStoppedException<TExType>(List<EventArgs> receivedEvents) where TExType : Exception 
-        {
-            Assert.Equal(1, receivedEvents.Count);
-            ReadingStoppedArgs readingStoppedArgs = Assert.IsType<ReadingStoppedArgs>(receivedEvents[0]);
-            
-            TExType protocolError = Assert.IsType<TExType>(readingStoppedArgs.Exception);
-            return protocolError;
+            Assert.True(reader.ReadingFinished);
         }
         
         [Fact]
@@ -49,15 +108,13 @@ namespace AElf.Network.Tests.MessageTests
         {
             int maxSize = 1024;
 
-            byte[] type = {0};
-            byte[] isBuffered = {0};
-            byte[] intBytes = BitConverter.GetBytes(maxSize + 1);
+            var msg = CreateMessage(0, maxSize+1);
             
             Mock<INetworkStream> networkStream = new Mock<INetworkStream>();
             networkStream.SetupSequence(ns => ns.ReadBytesAsync(It.IsAny<int>()))
-                .ReturnsAsync(type)
-                .ReturnsAsync(isBuffered)
-                .ReturnsAsync(intBytes);
+                .ReturnsAsync(msg.Type)
+                .ReturnsAsync(msg.IsBuffered)
+                .ReturnsAsync(msg.Size);
             
             MessageReader reader = new MessageReader(networkStream.Object);
             reader.MaxMessageSize = maxSize;
@@ -72,7 +129,7 @@ namespace AElf.Network.Tests.MessageTests
 
             ProtocolViolationException ex = AssertReadingStoppedException<ProtocolViolationException>(receivedEvents);
             Assert.Equal(ex.Message, $"Received a message that is larger than the maximum " +
-                                                $"accepted size ({maxSize} bytes). Size : {maxSize+1} bytes.");
+                                     $"accepted size ({maxSize} bytes). Size : {maxSize+1} bytes.");
         }
 
         [Fact]
@@ -86,5 +143,7 @@ namespace AElf.Network.Tests.MessageTests
         {
             //todo
         }
+
+        #endregion Reading stopped tests
     }
 }

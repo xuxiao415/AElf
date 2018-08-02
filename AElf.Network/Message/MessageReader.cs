@@ -34,11 +34,13 @@ namespace AElf.Network.Message
         public event EventHandler ReadingStopped;
 
         private readonly List<PartialMessage> _partialMessageBuffer;
-        private int _partialMessageCurrentSize = 0;
-
+        private int _partialMessageCurrentSize;
+        private int? _currentMessageTotalSize;
+        private int? _lastIndexReceived;
+        
         public int MaxMessageSize { get; set; } = DefaultMaxMessageSize;
 
-        public bool IsConnected { get; private set; }
+        public bool ReadingFinished { get; private set; }
         
         public MessageReader(INetworkStream stream)
         {
@@ -49,8 +51,6 @@ namespace AElf.Network.Message
         public void Start()
         {
             Task.Run(Read).ConfigureAwait(false);
-            IsConnected = true;
-
             _logger = LogManager.GetLogger(nameof(MessageReader));
         }
         
@@ -95,7 +95,7 @@ namespace AElf.Network.Message
             }
             catch (Exception e)
             {
-                if (!IsConnected && e is IOException)
+                if (!ReadingFinished && e is IOException)
                 {
                     // If the stream fails while the connection is logically closed (call to Close())
                     // we simply return - the StreamClosed event will no be closed.
@@ -119,10 +119,9 @@ namespace AElf.Network.Message
         {
             // Read the size of the data
             int length = await ReadInt();
-            
+
             if (length > MaxMessageSize)
-                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
-                                                     $"accepted size ({MaxMessageSize} bytes). Size : {length} bytes.");
+                ThrowInvalidMessageSizeException(length);
             
             // If it's not a partial packet the next "length" bytes should be 
             // the entire data
@@ -140,12 +139,38 @@ namespace AElf.Network.Message
             int length = await ReadInt();
             
             if (length > MaxMessageSize)
-                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
-                                                     $"accepted size ({MaxMessageSize} bytes). Size : {length} bytes.");
+                ThrowInvalidMessageSizeException(length);
             
             // If it's a partial packet read the packet info
             PartialMessage partialMessage = await ReadPartialPacket(length);
 
+            if (partialMessage.IsStart) // Start is index 0
+            {
+                if (_partialMessageBuffer.Count > 0 || _lastIndexReceived.HasValue || _partialMessageCurrentSize != 0)
+                    throw new ProtocolViolationException("Received last partial packet with invalid state.");
+
+                _currentMessageTotalSize = partialMessage.TotalDataSize;
+            }
+            
+            _partialMessageCurrentSize += length;
+
+            if (!_lastIndexReceived.HasValue)
+            {
+                _lastIndexReceived = partialMessage.Position;
+            }
+            else
+            {
+                
+            }
+
+            if (!_currentMessageTotalSize.HasValue)
+            {
+                _currentMessageTotalSize = partialMessage.TotalDataSize;
+                if (partialMessage.TotalDataSize > MaxMessageSize)
+                    throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
+                                                         $"accepted size ({MaxMessageSize} bytes). Size : {partialMessage.TotalDataSize} bytes.");
+            }
+                
             // todo property control
             // todo Contiguous position in the list - keep track of last index
 
@@ -153,6 +178,8 @@ namespace AElf.Network.Message
             {
                 _partialMessageBuffer.Add(partialMessage);
                 _logger.Trace($"Received message part : {(MessageType) type}, position : {partialMessage.Position}, length : {length}");
+                
+                ValidatePartialMessageReception();
                 
                 // If only partial reception return no message
                 return null;
@@ -165,16 +192,23 @@ namespace AElf.Network.Message
             byte[] allData = ByteArrayHelpers.Combine(_partialMessageBuffer.Select(pp => pp.Data).ToArray());
 
             _logger.Trace($"Received last message part : { _partialMessageBuffer.Count }, total length : { allData.Length }");
-
+                
             ResetBufferedMessageState();
 
             return new Message { Type = type, Length = allData.Length, Payload = allData };
         }
 
+        private void ValidatePartialMessageReception()
+        {
+            if (_partialMessageBuffer.Count <= 0 || _partialMessageCurrentSize == 0 || !_lastIndexReceived.HasValue)
+                throw new ProtocolViolationException("Received last partial packet with invalid state.");
+        }
+
         private void ResetBufferedMessageState()
         {
-            _partialMessageBuffer.Clear();
+            _partialMessageBuffer?.Clear();
             _partialMessageCurrentSize = 0;
+            _lastIndexReceived = null;
         }
 
         private async Task<int> ReadByte()
@@ -203,28 +237,35 @@ namespace AElf.Network.Message
             partialMessage.IsEnd = await ReadBoolean();
             partialMessage.TotalDataSize = await ReadInt();
             
-            if (partialMessage.TotalDataSize > MaxMessageSize)
-                throw new ProtocolViolationException($"Received a message that is larger than the maximum " +
-                                                     $"accepted size ({MaxMessageSize} bytes). Size : {partialMessage.TotalDataSize} bytes.");
-            
             // Read the data
             byte[] packetData = await _stream.ReadBytesAsync(dataLength);
             partialMessage.Data = packetData;
             
             return partialMessage;
         }
+
+        private void ThrowInvalidMessageSizeException(int size, bool isPartial = false)
+        {
+            string msg = $"Received a message that is larger than the maximum accepted size ({MaxMessageSize} bytes). Size : {size} bytes.";
+
+            if (isPartial)
+                msg += "(partial)";
+                    
+            throw new ProtocolViolationException(msg);
+        }
         
         #region Closing and disposing
 
         public void Close()
         {
+            ResetBufferedMessageState();
             Dispose();
         }
         
         public void Dispose()
         {
             // Change logical connection state
-            IsConnected = false;
+            ReadingFinished = true;
             
             // This will cause an IOException in the read loop
             // but since IsConnected is switched to false, it 
