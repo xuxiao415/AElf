@@ -48,6 +48,8 @@ namespace AElf.Benchmark
             {
                 KeyList.Add(Hash.Generate().ToAccount());
             }
+
+            Console.WriteLine($"GenKey: \n\t\t {string.Join("\n\t\t", KeyList.Select(a => $"[{a.ToHex()}] KeyHash: [{a.CalculateHash().ToHex()}]"))}");
         }
 
         private IEnumerable<KeyValuePair<Hash, Hash>> GenerateTransferAddressPair(int txCount, double conflictRate, ref Iterator<Hash> keyDictIter)
@@ -94,9 +96,11 @@ namespace AElf.Benchmark
             List<ITransaction> txList = new List<ITransaction>();
             for (int i = 0; i < groupCount; i++)
             {
-                var addrPair = GenerateTransferAddressPair(txNumPerGroup, 1, ref keyDictIter);
+                var addrPair = GenerateTransferAddressPair(txNumPerGroup, 1, ref keyDictIter).ToList();
                 var groupTxList = GenerateTransferTransactions(contractAddr, addrPair);
                 txList.AddRange(groupTxList);
+
+                Console.WriteLine($"Gentx Group {i}: {string.Join("\n\t\t ", addrPair.Select(pair => $"[{pair.Key.ToHex()}, {pair.Value.ToHex()}]"))}");
             }
 
             return txList;

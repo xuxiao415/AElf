@@ -145,6 +145,8 @@ namespace AElf.Execution.Scheduling
                 _logger?.Info(string.Format(
                     "Grouper on chainId [{0}] merge {1} groups into {2} groups with sizes [{3}]", chainId,
                     groupResults.Item1.Count, mergedGroups.Count, string.Join(", ", mergedGroups.Select(a=>a.Count))));
+                
+                _logger?.Debug($"Group result: \n {string.Join("\n\t\t", groupResults.Item1.Select(a => $"subGroup{groupResults.Item1.IndexOf(a)}: {string.Join(", ", a.Select(x => $"[{x.From.ToHex()}]"))}"))}");
 
 
                 return new Tuple<List<List<ITransaction>>, Dictionary<ITransaction, Exception>>(mergedGroups, groupResults.Item2);

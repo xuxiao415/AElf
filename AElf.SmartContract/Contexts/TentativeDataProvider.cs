@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using AElf.Kernel;
@@ -15,6 +16,7 @@ namespace AElf.SmartContract
         private readonly Dictionary<Hash, StateCache> _tentativeCache = new Dictionary<Hash, StateCache>();
         
         //Injected from outside for the entry data provider of the executive ( in worker actor )
+        //Don't need to be ConcurrentDictionary because this should not be shared between actors, i.e. threads
         public Dictionary<Hash, StateCache> StateCache
         {
             get => _stateCache;
@@ -33,6 +35,7 @@ namespace AElf.SmartContract
 
         private async Task<StateCache> GetStateAsync(Hash keyHash)
         {
+            Console.WriteLine($"ThreadID [{Thread.CurrentThread.ManagedThreadId}] DP TryGet {keyHash.ToHex()} with path {GetPathFor(keyHash)}");
             if (!_tentativeCache.TryGetValue(keyHash, out var state))
             {
                 if (!StateCache.TryGetValue(GetPathFor(keyHash), out state))
