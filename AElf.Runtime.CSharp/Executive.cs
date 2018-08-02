@@ -161,13 +161,16 @@ namespace AElf.Runtime.CSharp
 
                     try
                     {
-                        _currentSmartContractContext.DataProvider.ClearTentativeCache();
                         var retVal = await handler(tx.Params.ToByteArray());
                         _currentTransactionContext.Trace.RetVal = retVal;
                     }
                     catch (Exception ex)
                     {
                         _currentTransactionContext.Trace.StdErr += "\n" + ex;
+                    }
+                    finally
+                    {
+                        _currentSmartContractContext.DataProvider.ClearTentativeCache();
                     }
                 }
                 else
@@ -181,13 +184,16 @@ namespace AElf.Runtime.CSharp
 
                     try
                     {
-                        _currentSmartContractContext.DataProvider.ClearTentativeCache();
                         var retVal = handler(tx.Params.ToByteArray());
                         _currentTransactionContext.Trace.RetVal = retVal;
                     }
                     catch (Exception ex)
                     {
                         _currentTransactionContext.Trace.StdErr += "\n" + ex;
+                    }
+                    finally
+                    {
+                        _currentSmartContractContext.DataProvider.ClearTentativeCache();
                     }
                 }
 
