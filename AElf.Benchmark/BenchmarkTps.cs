@@ -28,7 +28,6 @@ namespace AElf.Benchmark
         private readonly BenchmarkOptions _options;
         private readonly IConcurrencyExecutingService _concurrencyExecutingService;
 
-
         private readonly ServicePack _servicePack;
 
         private readonly TransactionDataGenerator _dataGenerater;
@@ -57,8 +56,8 @@ namespace AElf.Benchmark
         {
             ChainId = Hash.Generate();
             
-            var worldStateDictator1 = worldStateDictator;
-            worldStateDictator1.SetChainId(ChainId).DeleteChangeBeforesImmidiately = true;
+            worldStateDictator.SetChainId(ChainId).DeleteChangeBeforesImmidiately = true;
+            worldStateDictator.BlockProducerAccountAddress = Hash.Generate();
             
             _chainCreationService = chainCreationService;
             _blockManager = blockManager;
@@ -73,7 +72,7 @@ namespace AElf.Benchmark
                 ChainContextService = chainContextService,
                 SmartContractService = _smartContractService,
                 ResourceDetectionService = new ResourceUsageDetectionService(functionMetadataService),
-                WorldStateDictator = worldStateDictator1,
+                WorldStateDictator = worldStateDictator,
                 AccountContextService = accountContextService,
             };
 
@@ -93,6 +92,7 @@ namespace AElf.Benchmark
 
         public async Task BenchmarkEvenGroup()
         {
+            Thread.Sleep(2000);
             var resDict = new Dictionary<string, double>();
             try
             {
