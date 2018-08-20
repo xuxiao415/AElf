@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "AElf.Network.Sim";
+
+message NetPeerEventData {
+
+    enum EventType {
+        ADDED = 0;
+        REMOVED = 1;
+    }
+
+    EventType eventType = 2;
+    NodeData node = 3;
+    NodeData source = 4;
+}
+
+message NodeData {
+    string IpAddress = 1;
+    int32 Port = 2;
+}

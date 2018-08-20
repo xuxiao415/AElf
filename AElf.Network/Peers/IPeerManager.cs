@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using AElf.Network.Data;
 
 namespace AElf.Network.Peers
 {
@@ -7,5 +9,6 @@ namespace AElf.Network.Peers
         event EventHandler PeerAdded;
         
         void Start();
+        List<NodeData> GetPeers();
     }
 }

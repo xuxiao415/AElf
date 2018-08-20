@@ -18,6 +18,17 @@ message NodeData {
 
 // Payloads
 
+message NetPeerEventData {
+    
+    enum EventType {
+        ADDED = 0;
+        REMOVED = 1;
+    }
+    
+    EventType eventType = 2;
+    NodeData nodeData = 3;
+}
+
 message PeerListData {
     repeated NodeData nodeData = 1;
 }

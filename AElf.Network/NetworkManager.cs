@@ -70,6 +70,8 @@ namespace AElf.Network
 
         private BoundedByteArrayQueue _lastBlocksReceived;
         public int MaxBlockHistory { get; set; } = DefaultMaxBlockHistory;
+        
+        private BoundedByteArrayQueue _lastTxReceived;
 
         private BlockingPriorityQueue<PeerMessageReceivedArgs> _incomingJobs;
 
@@ -104,6 +106,7 @@ namespace AElf.Network
         {
             // init the queue
             _lastBlocksReceived = new BoundedByteArrayQueue(MaxBlockHistory);
+            _lastTxReceived = new BoundedByteArrayQueue(20);
             
             //todo _peerManager.PeerAdded 
             _peerManager.Start();
@@ -156,6 +159,16 @@ namespace AElf.Network
                     catch (Exception ex) { } // todo think about removing this try/catch, enqueue should be fire and forget
                 }
             }
+//            else if (args.Message.Type == (int) AElfProtocolType.BroadcastTx)
+//            {
+//                Transaction t = Transaction.Parser.ParseFrom(args.Message.Payload);
+//                byte[] txHash = t.GetHash().Value.ToByteArray();
+//
+//                if (_lastTxReceived.Contains(txHash))
+//                    return;
+//
+//                _lastTxReceived.Enqueue(txHash);
+//            }
                 
             var evt = new NetMessageReceivedArgs {
                 Message = args.Message,
@@ -176,6 +189,20 @@ namespace AElf.Network
         }
 
         #endregion
+
+        public void QueueRequest(byte[] payload)
+        {
+            
+            try
+            {
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
         
 //        public void QueueTransactionRequest(byte[] transactionHash, IPeer hint)
 //        {
@@ -511,7 +538,6 @@ namespace AElf.Network
         {
             try
             {
-                
                 Message packet = NetRequestFactory.CreateMessage(messageType, payload);
                 return BroadcastMessage(packet);
             }

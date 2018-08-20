@@ -126,8 +126,7 @@ namespace AElf.Launcher
                 netManager.Subscribe<TransactionAddedToPool>(
                     async (txAdded) =>
                     {
-                        await netManager.BroadcastMessage(AElfProtocolType.BroadcastTx,
-                            (await txAdded).Transaction.Serialize());
+                        await netManager.BroadcastMessage(AElfProtocolType.BroadcastTx, (await txAdded).Transaction.Serialize());
                     }
                 );
 

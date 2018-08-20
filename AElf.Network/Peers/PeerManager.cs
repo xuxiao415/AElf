@@ -23,11 +23,27 @@ namespace AElf.Network.Peers
         public NodeData Node { get; set; }
         public PeerMessageReceivedArgs Message { get; set; }
     }
+
+    public class NetPeerEventArgs : EventArgs
+    {
+        public NetPeerEventData Data { get; set; }
+            
+//        public enum NetPeerEventType
+//        {
+//            Removed,
+//            Added
+//        }
+//        
+//        public NetPeerEventType EventType { get; set; }
+//        public NodeData Node { get; set; }
+    }
     
     [LoggerName(nameof(PeerManager))]
     public class PeerManager : IPeerManager
     {
         public event EventHandler PeerAdded;
+        
+        public event EventHandler NetPeerEvent;
         
         private readonly IAElfNetworkConfig _networkConfig;
         
@@ -57,10 +73,10 @@ namespace AElf.Network.Peers
         
         public void Start()
         {
-            Task.Run(() => _connectionListener.StartListening(_networkConfig.ListeningPort));
-            
             _connectionListener.IncomingConnection += OnIncomingConnection;
             _connectionListener.ListeningStopped += OnListeningStopped;
+            
+            Task.Run(() => _connectionListener.StartListening(_networkConfig.ListeningPort));
             
             _maintenanceTimer = new System.Threading.Timer(e => DoPeerMaintenance(), null, _initialMaintenanceDelay, _maintenancePeriod);
             
@@ -105,6 +121,8 @@ namespace AElf.Network.Peers
                         _logger?.Trace("Error while dequeuing peer manager job: stopping the dequeing loop.");
                         break;
                     }
+
+                    Console.WriteLine("Job");
                 
                     // todo dispatch message
 
@@ -138,6 +156,15 @@ namespace AElf.Network.Peers
                 }
             }
         }
+
+        #region Service
+
+        public List<NodeData> GetPeers()
+        {
+            return _peers.Select(p => p.DistantNodeData).ToList();
+        }
+
+        #endregion
         
         #region Peer creation
 
@@ -236,6 +263,7 @@ namespace AElf.Network.Peers
             if (!peer.IsAuthentified)
             {
                 _logger?.Trace($"Peer not authentified, cannot add {peer}");
+                _authentifyingPeer.Remove(peer);
                 return;
             }
             
@@ -257,6 +285,9 @@ namespace AElf.Network.Peers
             peer.MessageReceived += OnPeerMessageReceived;
                 
             PeerAdded?.Invoke(this, new PeerAddedEventArgs { Peer = peer });
+            
+            NetPeerEventData data = new NetPeerEventData { EventType = NetPeerEventData.Types.EventType.Added, NodeData = peer.DistantNodeData };
+            NetPeerEvent?.Invoke(this, new NetPeerEventArgs { Data = data });
         }
 
         private void OnPeerMessageReceived(object sender, EventArgs args)
@@ -308,6 +339,9 @@ namespace AElf.Network.Peers
                 
                 if (!_peers.Remove(args.Peer))
                     _logger?.Trace($"Tried to remove peer, but not in list {args.Peer}");
+                
+                NetPeerEventData data = new NetPeerEventData { EventType = NetPeerEventData.Types.EventType.Removed, NodeData = peer.DistantNodeData };
+                NetPeerEvent?.Invoke(this, new NetPeerEventArgs { Data = data });
             }
         }
         
@@ -446,6 +480,7 @@ namespace AElf.Network.Peers
             {
                 IPeer peer = CreatePeerFromConnection(args.Client);
                 // todo if null
+                peer.PeerDisconnected += ProcessClientDisconnection;
                 StartAuthentification(peer);
             }
         }

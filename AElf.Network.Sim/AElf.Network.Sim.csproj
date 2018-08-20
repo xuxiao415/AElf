@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="NetMQ" Version="4.0.0.175-pre" />
+    <PackageReference Include="NLog" Version="4.5.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AElf.Network\AElf.Network.csproj">
+      <Project>{5FEFB079-F6EB-48AF-97C7-6C582B9BDB8A}</Project>
+      <Name>AElf.Network</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Target BeforeTargets="BeforeBuild" Name="Gen_proto">
+    <Exec Command="protoc --proto_path=./Messages --csharp_out=./Messages --csharp_opt=file_extension=.g.cs msgs.proto" />
+  </Target>
+  <Target Name="UpdateGeneratedFiles" DependsOnTargets="Gen_proto" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <Compile Include="./Data/Protobuf/*.g.cs" />
+    </ItemGroup>
+  </Target>
+</Project>
