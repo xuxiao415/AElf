@@ -41,9 +41,9 @@ namespace AElf.Concurrency.Manager
         public void StartSeedNodes()
         {
             _actorSystem = CreateActorSystem();
-            var pbm = PetabridgeCmd.Get(_actorSystem);
-            pbm.RegisterCommandPalette(ClusterCommands.Instance);
-            pbm.Start();
+//            var pbm = PetabridgeCmd.Get(_actorSystem);
+//            pbm.RegisterCommandPalette(ClusterCommands.Instance);
+//            pbm.Start();
         }
 
         public async Task StopAsync()
