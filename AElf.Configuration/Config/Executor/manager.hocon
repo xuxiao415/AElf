@@ -19,4 +19,8 @@ akka {
             port = 4053
         }
     }
+    
+    cluster {
+        metrics.enabled=off
+    }
 }

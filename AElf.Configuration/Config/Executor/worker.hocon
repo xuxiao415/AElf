@@ -12,4 +12,7 @@ akka {
             port = 32551
         }
     }
+    cluster {
+        metrics.enabled=off
+    }
 }
