@@ -19,8 +19,4 @@ akka {
             port = 4053
         }
     }
-
-    cluster {
-        seed-nodes = []
-    }
 }

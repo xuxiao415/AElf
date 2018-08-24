@@ -11,6 +11,7 @@ using AElf.Kernel;
 using AElf.SmartContract;
 using AElf.Configuration;
 using AElf.Execution;
+using Akka.Cluster;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AElf.Concurrency.Worker
@@ -36,6 +37,14 @@ namespace AElf.Concurrency.Worker
 
             _actorSystem = ActorSystem.Create(SystemName, config);
             InitLocalWorkers();
+            
+            List<Address> addresses =new List<Address>();
+            //addresses.Add(new Address("akka.tcp", SystemName, "127.0.0.1", 2551));
+            addresses.Add(new Address("akka.tcp", SystemName, "manager-0.manager-service", 2551));
+            
+            Cluster cluster = Cluster.Get(_actorSystem);
+            cluster.JoinSeedNodes(addresses);
+            
         }
 
         public void InitActorSystem()
@@ -85,9 +94,9 @@ namespace AElf.Concurrency.Worker
                 };
             }
 
-            var seeds = string.Join(",",
-                ActorConfig.Instance.Seeds.Select(s => $@"""akka.tcp://{SystemName}@{s.HostName}:{s.Port}"""));
-            var seedsString = $"akka.cluster.seed-nodes = [{seeds}]";
+//            var seeds = string.Join(",",
+//                ActorConfig.Instance.Seeds.Select(s => $@"""akka.tcp://{SystemName}@{s.HostName}:{s.Port}"""));
+//            var seedsString = $"akka.cluster.seed-nodes = [{seeds}]";
 
             var paths = string.Join(",",
                 Enumerable.Range(0, ActorConfig.Instance.ActorCount).Select(i => $@"""/user/worker{i}"""));
@@ -97,7 +106,7 @@ namespace AElf.Concurrency.Worker
                 .ParseString($"akka.remote.dot-netty.tcp.hostname = {ActorConfig.Instance.HostName}")
                 .WithFallback(
                     ConfigurationFactory.ParseString($"akka.remote.dot-netty.tcp.port = {ActorConfig.Instance.Port}"))
-                .WithFallback(ConfigurationFactory.ParseString(seedsString))
+                //.WithFallback(ConfigurationFactory.ParseString(seedsString))
                 .WithFallback(ConfigurationFactory.ParseString(pathsString))
                 .WithFallback(content);
 
