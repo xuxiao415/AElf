@@ -39,8 +39,8 @@ namespace AElf.Concurrency.Worker
             //InitLocalWorkers();
             
             List<Address> addresses =new List<Address>();
-            //addresses.Add(new Address("akka.tcp", SystemName, "127.0.0.1", 2551));
-            addresses.Add(new Address("akka.tcp", SystemName, "manager-0.manager-service", 2551));
+            addresses.Add(new Address("akka.tcp", SystemName, "127.0.0.1", 2551));
+            //addresses.Add(new Address("akka.tcp", SystemName, "manager-0.manager-service", 2551));
             
             Cluster cluster = Cluster.Get(_actorSystem);
             cluster.JoinSeedNodes(addresses);

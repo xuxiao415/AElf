@@ -2,7 +2,6 @@
 using AElf.Database;
 using AElf.Execution;
 using AElf.Kernel.Modules.AutofacModule;
-using AElf.Runtime.CSharp;
 using AElf.SmartContract;
 using Autofac;
 using NLog;
@@ -30,10 +29,8 @@ namespace AElf.Concurrency.Worker
             if (!parsed)
                 return;
 
-            var runner = new SmartContractRunner(confParser.RunnerConfig);
             var smartContractRunnerFactory = new SmartContractRunnerFactory();
-            smartContractRunnerFactory.AddRunner(0, runner);
-            smartContractRunnerFactory.AddRunner(1, runner);
+
 
             // Setup ioc 
             var container = SetupIocContainer(true, smartContractRunnerFactory);

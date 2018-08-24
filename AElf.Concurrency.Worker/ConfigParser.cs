@@ -11,7 +11,6 @@ using AElf.Configuration.Config.Network;
 using AElf.Kernel;
 using AElf.Kernel.Node;
 using AElf.Kernel.Types;
-using AElf.Runtime.CSharp;
 using CommandLine;
 using Google.Protobuf;
 using Newtonsoft.Json;
@@ -22,7 +21,6 @@ namespace AElf.Concurrency.Worker
     public class ConfigParser
     {
         public bool Success { get; private set; }
-        public IRunnerConfig RunnerConfig { get; private set; }
 
         /// <summary>
         /// chainId
@@ -86,23 +84,19 @@ namespace AElf.Concurrency.Worker
                 : opts.DataDir;
             
             // runner config
-            RunnerConfig = new RunnerConfig
-            {
-                SdkDir = Path.GetDirectoryName(typeof(Node.Node).Assembly.Location)
-            };
 
-            if (opts.RunnerConfig != null)
-            {
-                using (var file = File.OpenText(opts.RunnerConfig))
-                using (var reader = new JsonTextReader(file))
-                {
-                    var cfg = (JObject) JToken.ReadFrom(reader);
-                    if (cfg.TryGetValue("csharp", out var j))
-                    {
-                        RunnerConfig = Runtime.CSharp.RunnerConfig.FromJObject((JObject) j);
-                    }
-                }
-            }
+//            if (opts.RunnerConfig != null)
+//            {
+//                using (var file = File.OpenText(opts.RunnerConfig))
+//                using (var reader = new JsonTextReader(file))
+//                {
+//                    var cfg = (JObject) JToken.ReadFrom(reader);
+//                    if (cfg.TryGetValue("csharp", out var j))
+//                    {
+//                        RunnerConfig = Runtime.CSharp.RunnerConfig.FromJObject((JObject) j);
+//                    }
+//                }
+//            }
         }
     }
 }
