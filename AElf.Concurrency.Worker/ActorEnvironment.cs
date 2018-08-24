@@ -36,11 +36,11 @@ namespace AElf.Concurrency.Worker
             var config = PrepareActorConfig(ActorConfig.Instance.WorkerHoconConfig);
 
             _actorSystem = ActorSystem.Create(SystemName, config);
-            InitLocalWorkers();
+            //InitLocalWorkers();
             
             List<Address> addresses =new List<Address>();
-            //addresses.Add(new Address("akka.tcp", SystemName, "127.0.0.1", 2551));
-            addresses.Add(new Address("akka.tcp", SystemName, "manager-0.manager-service", 2551));
+            addresses.Add(new Address("akka.tcp", SystemName, "127.0.0.1", 2551));
+            //addresses.Add(new Address("akka.tcp", SystemName, "manager-0.manager-service", 2551));
             
             Cluster cluster = Cluster.Get(_actorSystem);
             cluster.JoinSeedNodes(addresses);
@@ -107,7 +107,7 @@ namespace AElf.Concurrency.Worker
                 .WithFallback(
                     ConfigurationFactory.ParseString($"akka.remote.dot-netty.tcp.port = {ActorConfig.Instance.Port}"))
                 //.WithFallback(ConfigurationFactory.ParseString(seedsString))
-                .WithFallback(ConfigurationFactory.ParseString(pathsString))
+                //.WithFallback(ConfigurationFactory.ParseString(pathsString))
                 .WithFallback(content);
 
             return config;
