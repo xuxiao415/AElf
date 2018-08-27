@@ -45,7 +45,7 @@ namespace AElf.Management.Commands
                                 new V1Container
                                 {
                                     Name = DeploymentName,
-                                    Image = "aelf/node:worker",
+                                    Image = "aelf/node:test",
                                     Ports = new List<V1ContainerPort>
                                     {
                                         new V1ContainerPort(Port)
@@ -58,6 +58,7 @@ namespace AElf.Management.Commands
                                             ValueFrom = new V1EnvVarSource {FieldRef = new V1ObjectFieldSelector {FieldPath = "status.podIP"}}
                                         }
                                     },
+                                    Command = new List<string> {"dotnet", "AElf.Concurrency.Worker.dll"},
                                     Args = new List<string> {"--actor.host", "$(POD_IP)", "--actor.port", Port.ToString()},
                                     VolumeMounts = new List<V1VolumeMount>
                                     {

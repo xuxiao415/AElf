@@ -83,7 +83,7 @@ namespace AElf.Management.Commands
                                 new V1Container
                                 {
                                     Name = StatefulSetName,
-                                    Image = "aelf/node:manager",
+                                    Image = "aelf/node:test",
                                     Ports = new List<V1ContainerPort> {new V1ContainerPort(Port)},
                                     Env = new List<V1EnvVar>
                                     {
@@ -93,6 +93,7 @@ namespace AElf.Management.Commands
                                             ValueFrom = new V1EnvVarSource {FieldRef = new V1ObjectFieldSelector("metadata.name")}
                                         }
                                     },
+                                    Command = new List<string> {"dotnet", "AElf.Concurrency.Manager.dll"},
                                     Args = new List<string> {"--actor.host", "$(POD_NAME)." + ServiceName, "--actor.port", Port.ToString()},
                                     VolumeMounts = new List<V1VolumeMount>
                                     {
