@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using AElf.Management.Helper;
 using AElf.Management.Models;
 using k8s;
@@ -11,13 +13,18 @@ namespace AElf.Management.Commands
         private const string ServiceName = "service-manager";
         private const string StatefulSetName = "set-manager";
         private const int Port = 4053;
+        private const int Replicas = 1;
         
         public void Action(string chainId, DeployArg arg)
         {
             if (arg.ManagerArg.IsCluster)
             {
-                AddService(chainId,arg);
-                AddStatefulSet(chainId, arg);
+                AddService(chainId, arg);
+                var addSetResult = AddStatefulSet(chainId, arg);
+                if (!addSetResult)
+                {
+                    //throw new Exception("failed to deploy manager");
+                }
             }
         }
 
@@ -50,7 +57,7 @@ namespace AElf.Management.Commands
             K8SRequestHelper.GetClient().CreateNamespacedService(body, chainId);
         }
 
-        private void AddStatefulSet(string chainId, DeployArg arg)
+        private bool AddStatefulSet(string chainId, DeployArg arg)
         {
             var body = new V1beta1StatefulSet
             {
@@ -69,7 +76,7 @@ namespace AElf.Management.Commands
                         }
                     },
                     ServiceName = ServiceName,
-                    Replicas = 1,
+                    Replicas = Replicas,
                     Template = new V1PodTemplateSpec
                     {
                         Metadata = new V1ObjectMeta
@@ -114,7 +121,40 @@ namespace AElf.Management.Commands
                 }
             };
 
-            K8SRequestHelper.GetClient().CreateNamespacedStatefulSet1(body, chainId);
+            var result = K8SRequestHelper.GetClient().CreateNamespacedStatefulSet1(body, chainId);
+            
+            var set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet1(result.Metadata.Name, chainId);
+            var retryGetCount = 0;
+            var retryDeleteCount = 0;
+            while (true)
+            {
+                if (set.Status.ReadyReplicas.HasValue && set.Status.ReadyReplicas.Value == Replicas)
+                {
+                    break;
+                }
+                if (retryGetCount > GlobalSetting.DeployRetryTime)
+                {
+                    DeletePod(chainId, arg);
+                    retryDeleteCount++;
+                    retryGetCount = 0;
+                }
+                
+                if (retryDeleteCount > GlobalSetting.DeployRetryTime)
+                {
+                    return false;
+                }
+
+                retryGetCount++;
+                Thread.Sleep(3000);
+                set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet1(result.Metadata.Name, chainId);
+            }
+
+            return true;
+        }
+        
+        private void DeletePod(string chainId, DeployArg arg)
+        {
+            K8SRequestHelper.GetClient().DeleteCollectionNamespacedPod(chainId, labelSelector: "name=" + StatefulSetName);
         }
     }
 }
