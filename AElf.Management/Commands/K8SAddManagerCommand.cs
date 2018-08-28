@@ -59,14 +59,14 @@ namespace AElf.Management.Commands
 
         private bool AddStatefulSet(string chainId, DeployArg arg)
         {
-            var body = new V1beta1StatefulSet
+            var body = new V1StatefulSet
             {
                 Metadata = new V1ObjectMeta
                 {
                     Name = StatefulSetName,
                     Labels = new Dictionary<string, string> {{"name", StatefulSetName}}
                 },
-                Spec = new V1beta1StatefulSetSpec
+                Spec = new V1StatefulSetSpec
                 {
                     Selector = new V1LabelSelector
                     {
@@ -121,9 +121,9 @@ namespace AElf.Management.Commands
                 }
             };
 
-            var result = K8SRequestHelper.GetClient().CreateNamespacedStatefulSet1(body, chainId);
+            var result = K8SRequestHelper.GetClient().CreateNamespacedStatefulSet(body, chainId);
             
-            var set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet1(result.Metadata.Name, chainId);
+            var set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet(result.Metadata.Name, chainId);
             var retryGetCount = 0;
             var retryDeleteCount = 0;
             while (true)
@@ -146,7 +146,7 @@ namespace AElf.Management.Commands
 
                 retryGetCount++;
                 Thread.Sleep(3000);
-                set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet1(result.Metadata.Name, chainId);
+                set = K8SRequestHelper.GetClient().ReadNamespacedStatefulSet(result.Metadata.Name, chainId);
             }
 
             return true;

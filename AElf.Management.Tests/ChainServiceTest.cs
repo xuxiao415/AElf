@@ -7,7 +7,7 @@ namespace AElf.Management.Tests
 {
     public class ChainServiceTest
     {
-        private string chainId = "0x7ff43092349f2feeb370fde5834608d746b7";
+        private string chainId = "0x8dec57e833dcf10b977b2076654007feadfa";
 
         //[Fact(Skip = "require aws account")]
         [Fact]

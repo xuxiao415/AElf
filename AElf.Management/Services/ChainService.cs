@@ -77,7 +77,7 @@ namespace AElf.Management.Services
             arg1.ManagerArg=new DeployManagerArg();
             arg1.ManagerArg.IsCluster = true;
             arg1.WorkArg = new DeployWorkArg();
-            arg1.WorkArg.WorkerCount = 20;
+            arg1.WorkArg.WorkerCount = 2;
             arg1.WorkArg.ActorCount = 4;
             arg1.LauncherArg=new DeployLauncherArg();
             arg1.LauncherArg.IsConsensusInfoGenerator = true;

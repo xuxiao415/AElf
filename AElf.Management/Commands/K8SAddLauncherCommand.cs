@@ -62,9 +62,9 @@ namespace AElf.Management.Commands
 
         private bool AddDeployment(string chainId, DeployArg arg)
         {
-            var body = new Extensionsv1beta1Deployment
+            var body = new V1Deployment
             {
-                ApiVersion = "extensions/v1beta1",
+                //ApiVersion = "extensions/v1beta1",
                 Kind = "Deployment",
                 Metadata = new V1ObjectMeta
                 {
@@ -72,8 +72,9 @@ namespace AElf.Management.Commands
                     Labels = new Dictionary<string, string> {{"name", DeploymentName}}
                 },
 
-                Spec = new Extensionsv1beta1DeploymentSpec
+                Spec = new V1DeploymentSpec
                 {
+                    Selector = new V1LabelSelector {MatchLabels = new Dictionary<string, string> {{"name", DeploymentName}}},
                     Replicas = Replicas,
                     Template = new V1PodTemplateSpec
                     {
@@ -170,7 +171,7 @@ namespace AElf.Management.Commands
 
             };
 
-            var result = K8SRequestHelper.GetClient().CreateNamespacedDeployment3(body, chainId);
+            var result = K8SRequestHelper.GetClient().CreateNamespacedDeployment(body, chainId);
             
             var deploy = K8SRequestHelper.GetClient().ReadNamespacedDeployment(result.Metadata.Name, chainId);
             var retryGetCount = 0;
