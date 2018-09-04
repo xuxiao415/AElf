@@ -191,16 +191,17 @@ namespace AElf.Miner.Miner
                             executed.Add(tx);
                         }
                     }
-                    _logger?.Log(LogLevel.Debug, $"Check rollback-End");
+                    _logger?.Log(LogLevel.Debug, $"##Check rollback-End");
 
-                    _logger?.Log(LogLevel.Debug, $"Check Tx Update-Start");
+                    _logger?.Log(LogLevel.Debug, $"##Check Tx Update-Start");
                     var addrs = await InsertTxs(executed, results);
+                    _logger?.Log(LogLevel.Debug, $"##Update Context");
                     await _txPoolService.UpdateAccountContext(addrs);
-                    _logger?.Log(LogLevel.Debug, $"Check Tx Update-End");
+                    _logger?.Log(LogLevel.Debug, $"##Check Tx Update-End");
 
                     // generate block
                     var block = await GenerateBlockAsync(Config.ChainId, results);
-
+                    _logger?.Log(LogLevel.Debug, $"##Check Bloom Header-Start");
                     block.Header.Bloom = ByteString.CopyFrom(
                         Bloom.AndMultipleBloomBytes(
                             results.Where(x => !x.Bloom.IsEmpty).Select(x => x.Bloom.ToByteArray())
