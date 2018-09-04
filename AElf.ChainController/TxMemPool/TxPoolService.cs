@@ -410,7 +410,8 @@ namespace AElf.ChainController.TxMemPool
         /// <inheritdoc/>
         public async Task RollBack(List<Transaction> txsOut)
         {
-            _logger?.Log(LogLevel.Debug, "Rollback {0} txs ...", txsOut.Count);
+            if(txsOut.Count >0)
+                _logger?.Log(LogLevel.Debug, "Rollback {0} txs ...", txsOut.Count);
 
             try
             {
@@ -482,8 +483,9 @@ namespace AElf.ChainController.TxMemPool
                 _logger.Error(e);
                 throw;
             }
-            
-            _logger?.Log(LogLevel.Debug, "Rollbacked {0} txs.", txsOut.Count);
+
+            if(txsOut.Count >0)
+                _logger?.Log(LogLevel.Debug, "Rollbacked {0} txs.", txsOut.Count);
         }
 
         public void SetBlockVolume(ulong minimal, ulong maximal)

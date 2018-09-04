@@ -176,6 +176,7 @@ namespace AElf.Miner.Miner
 
                     // insert txs to db
                     // update tx pool state
+                    _logger?.Log(LogLevel.Debug, $"Check rollback-Start");
                     var canceled = canceledTxIds.ToHashSet();
                     var executed = new List<Transaction>();
                     var rollback = new List<Transaction>();
@@ -190,9 +191,12 @@ namespace AElf.Miner.Miner
                             executed.Add(tx);
                         }
                     }
+                    _logger?.Log(LogLevel.Debug, $"Check rollback-End");
 
+                    _logger?.Log(LogLevel.Debug, $"Check Tx Update-Start");
                     var addrs = await InsertTxs(executed, results);
                     await _txPoolService.UpdateAccountContext(addrs);
+                    _logger?.Log(LogLevel.Debug, $"Check Tx Update-End");
 
                     // generate block
                     var block = await GenerateBlockAsync(Config.ChainId, results);
