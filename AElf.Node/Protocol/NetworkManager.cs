@@ -61,10 +61,13 @@ namespace AElf.Node.Protocol
         private BoundedByteArrayQueue _lastTxReceived;
 
         private readonly BlockingPriorityQueue<PeerMessageReceivedArgs> _incomingJobs;
-
+        
         private readonly List<byte[]> _bpKeys;
 
-        private readonly string _nodeName;
+        private byte[] _nodeKey;
+        private string _nodeName;
+
+        private bool _isBp;
 
         public NetworkManager(ITxPoolService transactionPoolService, IPeerManager peerManager, ILogger logger)
         {
@@ -80,7 +83,7 @@ namespace AElf.Node.Protocol
             
             peerManager.PeerEvent += PeerManagerOnPeerAdded;
 
-            SetBps();
+            SetBpConfig();
 
             MessageHub.Instance.Subscribe<TransactionAddedToPool>(async inTx =>
                 {
@@ -96,15 +99,27 @@ namespace AElf.Node.Protocol
                 });
         }
 
-        private void SetBps()
+        private void SetBpConfig()
         {
             var producers = MinersConfig.Instance.Producers;
 
-            foreach (var bp in producers.Values)
+            // Set the list of block producers
+            try
             {
-                byte[] key = ByteArrayHelpers.FromHexString(bp["address"]);
-                _bpKeys.Add(key);
+                foreach (var bp in producers.Values)
+                {
+                    byte[] key = ByteArrayHelpers.FromHexString(bp["address"]);
+                    _bpKeys.Add(key);
+                }
             }
+            catch (Exception e)
+            {
+                _logger?.Warn(e, "Error while reading mining info.");
+            }
+            
+            // This nodes key
+            _nodeKey = ByteArrayHelpers.FromHexString(NodeConfig.Instance.NodeAccount);
+            _isBp = _bpKeys.Any(k => k.BytesEqual(_nodeKey));
         }
 
         #region Eventing
