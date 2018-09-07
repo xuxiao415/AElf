@@ -64,6 +64,8 @@ namespace AElf.Node.Protocol
 
         private readonly List<byte[]> _bpKeys;
 
+        private readonly string _nodeName;
+
         public NetworkManager(ITxPoolService transactionPoolService, IPeerManager peerManager, ILogger logger)
         {
             _incomingJobs = new BlockingPriorityQueue<PeerMessageReceivedArgs>();
@@ -73,6 +75,8 @@ namespace AElf.Node.Protocol
             _transactionPoolService = transactionPoolService;
             _peerManager = peerManager;
             _logger = logger;
+
+            _nodeName = NodeConfig.Instance.NodeName;
             
             peerManager.PeerEvent += PeerManagerOnPeerAdded;
 
