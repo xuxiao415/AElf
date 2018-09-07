@@ -9,6 +9,7 @@ using AElf.Common.Attributes;
 using AElf.Common.ByteArrayHelpers;
 using AElf.Common.Collections;
 using AElf.Common.Extensions;
+using AElf.Configuration;
 using AElf.Kernel;
 using AElf.Network;
 using AElf.Network.Connection;
@@ -61,16 +62,21 @@ namespace AElf.Node.Protocol
 
         private readonly BlockingPriorityQueue<PeerMessageReceivedArgs> _incomingJobs;
 
+        private readonly List<byte[]> _bpKeys;
+
         public NetworkManager(ITxPoolService transactionPoolService, IPeerManager peerManager, ILogger logger)
         {
             _incomingJobs = new BlockingPriorityQueue<PeerMessageReceivedArgs>();
             _pendingRequests = new List<TimeoutRequest>();
+            _bpKeys = new List<byte[]>();
 
             _transactionPoolService = transactionPoolService;
             _peerManager = peerManager;
             _logger = logger;
             
             peerManager.PeerEvent += PeerManagerOnPeerAdded;
+
+            SetBps();
 
             MessageHub.Instance.Subscribe<TransactionAddedToPool>(async inTx =>
                 {
@@ -84,6 +90,17 @@ namespace AElf.Node.Protocol
                     await BroadcastBlock(b.Block.GetHash().GetHashBytes(), serializedBlock);
                     _logger?.Trace($"[event] Broadcasted block \"{b.Block.GetHash().GetHashBytes().ToHex()}\" to peers with {b.Block.Body.TransactionsCount} tx(s). Block height: [{b.Block.Header.Index}].");
                 });
+        }
+
+        private void SetBps()
+        {
+            var producers = MinersConfig.Instance.Producers;
+
+            foreach (var bp in producers.Values)
+            {
+                byte[] key = ByteArrayHelpers.FromHexString(bp["address"]);
+                _bpKeys.Add(key);
+            }
         }
 
         #region Eventing
