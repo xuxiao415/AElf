@@ -50,6 +50,7 @@ namespace AElf.RPC
             }
             catch (Exception e)
             {
+                throw e;
                 return false;
             }
 
