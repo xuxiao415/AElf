@@ -1,4 +1,5 @@
-﻿using AElf.Common.Module;
+﻿using System;
+using AElf.Common.Module;
 using AElf.Configuration.Config.RPC;
 using Autofac;
 
@@ -14,7 +15,8 @@ namespace AElf.RPC
         public void Run(ILifetimeScope scope)
         {
             var rpc = scope.Resolve<IRpcServer>();
-            rpc.Init(scope, RpcConfig.Instance.Host, RpcConfig.Instance.Port);
+            var result = rpc.Init(scope, RpcConfig.Instance.Host, RpcConfig.Instance.Port);
+            Console.WriteLine("rpc init result:" + result);
         }
     }
 }
