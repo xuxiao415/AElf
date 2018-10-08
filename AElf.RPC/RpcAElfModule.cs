@@ -9,12 +9,13 @@ namespace AElf.RPC
     {
         public void Init(ContainerBuilder builder)
         {
+            Console.WriteLine("rpc begin init");
             builder.RegisterModule(new RpcAutofacModule());
         }
 
         public void Run(ILifetimeScope scope)
         {
-            Console.WriteLine("rpc begin init");
+            Console.WriteLine("rpc begin init run");
             var rpc = scope.Resolve<IRpcServer>();
             var result = rpc.Init(scope, RpcConfig.Instance.Host, RpcConfig.Instance.Port);
             Console.WriteLine("rpc init result:" + result);
