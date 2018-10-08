@@ -22,6 +22,7 @@ namespace AElf.Launcher
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("v=1.0.0.0");
             Console.WriteLine(string.Join(" ", args));
 
             var parsed = new CommandLineParser();
