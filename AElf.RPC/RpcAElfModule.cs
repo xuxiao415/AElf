@@ -14,6 +14,7 @@ namespace AElf.RPC
 
         public void Run(ILifetimeScope scope)
         {
+            Console.WriteLine("rpc begin init");
             var rpc = scope.Resolve<IRpcServer>();
             var result = rpc.Init(scope, RpcConfig.Instance.Host, RpcConfig.Instance.Port);
             Console.WriteLine("rpc init result:" + result);
