@@ -99,9 +99,9 @@ namespace AElf.Execution.Scheduling
             }
             result.AddRange(grouped.Values);
 
-            _logger?.Info(string.Format(
+            /*_logger?.Info(string.Format(
                 "Grouper on chainId \"{0}\" group [{1}] transactions into [{2}] groups with sizes [{3}], There are also {4} transactions failed retriving resource", chainId.ToHex(),
-                transactions.Count, result.Count, string.Join(", ", result.Select(a=>a.Count)), failedTxs.Count));
+                transactions.Count, result.Count, string.Join(", ", result.Select(a=>a.Count)), failedTxs.Count));*/
             
             return new Tuple<List<List<ITransaction>>, Dictionary<ITransaction, Exception>>(result, failedTxs);;
         }
@@ -142,9 +142,9 @@ namespace AElf.Execution.Scheduling
                     _logger?.Error("Grouper: unsupported strategy: " + strategy);
                 }
                 
-                _logger?.Info(string.Format(
+                /*_logger?.Info(string.Format(
                     "Grouper on chainId [{0}] merge {1} groups into {2} groups with sizes [{3}]", chainId,
-                    groupResults.Item1.Count, mergedGroups.Count, string.Join(", ", mergedGroups.Select(a=>a.Count))));
+                    groupResults.Item1.Count, mergedGroups.Count, string.Join(", ", mergedGroups.Select(a=>a.Count))));*/
 
 
                 return new Tuple<List<List<ITransaction>>, Dictionary<ITransaction, Exception>>(mergedGroups, groupResults.Item2);
