@@ -122,7 +122,30 @@ namespace AElf.Benchmark
 
             var targets = GetTargetHashesForTransfer(txList);
             var originBalance = await ReadBalancesForAddrs(targets, _contractHash);
-            var expectedTransferBalance = originBalance.Select(balance => balance + (ulong)(((txNumber / groupCount) * 20)*repeatTime)).ToList();
+            var txNumbersPerGroup = new int[groupCount];
+
+            if (groupCount > 1 && tiltRate > 0)
+            {
+                txNumbersPerGroup[0] = (int)(txNumber * tiltRate);
+                for (int i = 1; i < groupCount; i++)
+                {
+                    txNumbersPerGroup[i] = (txNumber - txNumbersPerGroup[0]) / (groupCount - 1);
+                }
+            }
+            else if (groupCount >= 1 && tiltRate == 0)
+            {
+                for (int i = 0; i < groupCount; i++)
+                {
+                    txNumbersPerGroup[i] = txNumber / groupCount;
+                }
+            }
+            else
+            {
+                throw new Exception("grouprange or tiltRate is wrong!");
+            }
+
+            int index = 0;
+            var expectedTransferBalance = originBalance.Select(balance => balance + (ulong)(((txNumbersPerGroup[index++]) * 20)*repeatTime)).ToList();
             
             long timeused = 0;
             
@@ -158,13 +181,14 @@ namespace AElf.Benchmark
             
             //A double zip, first combine expectedTransferBalance with acturalBalance to get the compare string " {tx count per group} * transferBal * repeatTime = {expected} || {actural}"
             //              then combine originBalance with the compare string above.
+            index = 0;
             _logger.Info(
                 $"Validation for balance transfer for {groupCount} group with {txNumber / groupCount} transactions: \n\t" +
                 string.Join("\n\t",
                     originBalance.Zip(
                         expectedTransferBalance.Zip(
                             acturalBalance,
-                            (expected, actural) => $"{txNumber / groupCount} * 20 * {repeatTime} = {expected} || actural: {actural}"),
+                            (expected, actural) => $"{txNumbersPerGroup[index++]} * 20 * {repeatTime} = {expected} || actural: {actural}"),
                         (origin, compareStr) => $"expected: {origin} + {compareStr}")));
 
 
