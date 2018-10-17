@@ -152,8 +152,8 @@ namespace AElf.Benchmark
                 dataGenerator.PersistAddrsToFile(opts.AccountFileDir);
             }
 
-            Console.WriteLine("\n\nPress any key to continue ");
-            Console.ReadKey();
+            //Console.WriteLine("\n\nPress any key to continue ");
+            //Console.ReadKey();
         }
 
         private static bool CheckDbConnect(IComponentContext container)
