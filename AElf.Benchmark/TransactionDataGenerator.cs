@@ -86,15 +86,37 @@ namespace AElf.Benchmark
             return txList;
         }
 
-        public List<ITransaction> GetMultipleGroupTx(int txNumber, int groupCount, Hash contractAddr)
+        public List<ITransaction> GetMultipleGroupTx(int txNumber, int groupCount, double tiltRate, Hash contractAddr)
         {
             if(txNumber > _maxTxNumber)  throw new InvalidParameterException();
-            int txNumPerGroup = txNumber / groupCount;
+            //int txNumPerGroup = txNumber / groupCount;
+            var txNumbersPerGroup = new int[groupCount];
+
+            if (groupCount > 1 && tiltRate > 0)
+            {
+                txNumbersPerGroup[0] = (int)(txNumber * tiltRate);
+                for (int i = 1; i < groupCount; i++)
+                {
+                    txNumbersPerGroup[i] = (txNumber - txNumbersPerGroup[0]) / (groupCount - 1);
+                }
+            }
+            else if (groupCount >= 1 && tiltRate == 0)
+            {
+                for (int i = 0; i < groupCount; i++)
+                {
+                    txNumbersPerGroup[i] = txNumber / groupCount;
+                }
+            }
+            else
+            {
+                throw new Exception("grouprange or tiltRate is wrong!");
+            }
+            
             var keyDictIter = KeyList.Iterator();
             List<ITransaction> txList = new List<ITransaction>();
             for (int i = 0; i < groupCount; i++)
             {
-                var addrPair = GenerateTransferAddressPair(txNumPerGroup, 1, ref keyDictIter);
+                var addrPair = GenerateTransferAddressPair(txNumbersPerGroup[i], 1, ref keyDictIter);
                 var groupTxList = GenerateTransferTransactions(contractAddr, addrPair);
                 txList.AddRange(groupTxList);
             }

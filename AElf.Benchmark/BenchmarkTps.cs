@@ -99,7 +99,7 @@ namespace AElf.Benchmark
                 for (int currentGroupCount = _options.GroupRange.ElementAt(0); currentGroupCount <= _options.GroupRange.ElementAt(1); currentGroupCount++)
                 {
                     _logger.Info($"Start executing {currentGroupCount} groups where have {_options.TxNumber} transactions in total");
-                    var res = await MultipleGroupBenchmark(_options.TxNumber, currentGroupCount);
+                    var res = await MultipleGroupBenchmark(_options.TxNumber, currentGroupCount, _options.TiltRate);
                     resDict.Add(res.Key, res.Value);
                 }
 
@@ -114,11 +114,11 @@ namespace AElf.Benchmark
         }
 
 
-        public async Task<KeyValuePair<string, double>> MultipleGroupBenchmark(int txNumber, int groupCount)
+        public async Task<KeyValuePair<string, double>> MultipleGroupBenchmark(int txNumber, int groupCount, double tiltRate)
         {
             int repeatTime = _options.RepeatTime;
         
-            var txList = _dataGenerater.GetMultipleGroupTx(txNumber, groupCount, _contractHash);
+            var txList = _dataGenerater.GetMultipleGroupTx(txNumber, groupCount, tiltRate, _contractHash);
 
             var targets = GetTargetHashesForTransfer(txList);
             var originBalance = await ReadBalancesForAddrs(targets, _contractHash);
