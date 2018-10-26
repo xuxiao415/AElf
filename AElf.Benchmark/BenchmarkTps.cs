@@ -159,11 +159,8 @@ namespace AElf.Benchmark
                 Stopwatch swExec = new Stopwatch();
                 swExec.Start();
 
-                var txResult = await Task.Factory.StartNew(async () =>
-                {
-                    return await _concurrencyExecutingService.ExecuteAsync(txList, ChainId,new Grouper(_servicePack.ResourceDetectionService, _logger) );
-                }).Unwrap();
-        
+                var txResult = await _concurrencyExecutingService.ExecuteAsync(txList, ChainId,new Grouper(_servicePack.ResourceDetectionService, _logger) );
+                
                 swExec.Stop();
                 timeused += swExec.ElapsedMilliseconds;
                 txResult.ForEach(trace =>
