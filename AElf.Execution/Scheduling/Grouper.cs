@@ -249,19 +249,31 @@ namespace AElf.Execution.Scheduling
 
             if (res.Count > resGroupCount)
             {
-                var temp = res.OrderBy(a => a.Count).ToList();
-                res.Clear();
-                int index;
-                var merge = new List<ITransaction>();
-                for (index = 0; index <= temp.Count - resGroupCount; index++)
+                
+                var sortedList = res.OrderByDescending( a=> a.Count).ToList();
+                
+                while (sortedList.Count > totalCores)
                 {
-                    merge.AddRange(temp[index]);
+                    var min = sortedList[sortedList.Count - 1];
+                    var subMin = sortedList[sortedList.Count - 2];
+                    
+                    sortedList.RemoveRange(sortedList.Count - 2, 2);
+                    
+                    //merge two smallest groups
+                    subMin.AddRange(min);
+                    
+
+                    //start from before
+                    int index = sortedList.Count - 1;
+                    while (index >= 0 && sortedList[index].Count < subMin.Count)
+                    {
+                        index--;
+                    }
+                    
+                    sortedList.Insert(index + 1, subMin);
                 }
-                res.Add(merge);
-                for (; index < temp.Count; index++)
-                {
-                    res.Add(temp[index]);
-                }
+
+                res = sortedList;
             }
 
             return res;
