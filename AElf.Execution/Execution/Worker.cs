@@ -107,7 +107,8 @@ namespace AElf.Execution
  TODO: https://github.com/AElfProject/AElf/issues/338
             _state = State.Running;
 */
-
+            Console.WriteLine("RequestId: " + request.RequestId);
+            Console.WriteLine("Worker path: " + Self.Path);
             IChainContext chainContext = null;
 
             Exception chainContextException = null;
