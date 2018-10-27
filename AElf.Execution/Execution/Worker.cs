@@ -53,10 +53,7 @@ namespace AElf.Execution
                         _cancellationTokenSource?.Dispose();
                         _cancellationTokenSource = new CancellationTokenSource();
 
-                        RunJob(req).ContinueWith(
-                            task => task.Result,
-                            TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously
-                        );
+                        RunJob(req).Wait();
 /*
  Temporarily disabled.
  TODO: https://github.com/AElfProject/AElf/issues/338
