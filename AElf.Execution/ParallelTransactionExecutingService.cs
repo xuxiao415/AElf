@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
@@ -43,9 +44,13 @@ namespace AElf.Execution
                 //disable parallel module by default because it doesn't finish yet (don't support contract call)
                 if (ParallelConfig.Instance.IsParallelEnable)
                 {
+                    Stopwatch swExec = new Stopwatch();
+                    swExec.Start();
                     var groupRes = await _grouper.ProcessWithCoreCount(GroupStrategy.Limited_MaxAddMins, ActorConfig.Instance.ConcurrencyLevel, chainId, transactions);
                     groups = groupRes.Item1;
                     failedTxs = groupRes.Item2;
+                    swExec.Stop();
+                    Console.WriteLine("Used time for grouping: " + swExec.ElapsedMilliseconds + "ms");
                 }
                 else
                 {
@@ -77,6 +82,8 @@ namespace AElf.Execution
         private async Task<List<TransactionTrace>> AttemptToSendExecutionRequest(Hash chainId,
             List<ITransaction> transactions, CancellationToken token)
         {
+            Stopwatch swExec = new Stopwatch();
+            swExec.Start();
             while (!token.IsCancellationRequested)
             {
                 var tcs = new TaskCompletionSource<List<TransactionTrace>>();
@@ -90,13 +97,15 @@ namespace AElf.Execution
 
                 Thread.Sleep(1);
             }
-
+            swExec.Stop();
+            Console.WriteLine("Used time for execution per group: " + swExec.ElapsedMilliseconds + "ms");
             // Cancelled
             return transactions.Select(tx => new TransactionTrace()
             {
                 TransactionId = tx.GetHash(),
                 StdErr = "Execution Cancelled"
             }).ToList();
+            
         }
 
         private void CancelExecutions(object stateInfo)
