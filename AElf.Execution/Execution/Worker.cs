@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
@@ -53,7 +54,11 @@ namespace AElf.Execution
                         _cancellationTokenSource?.Dispose();
                         _cancellationTokenSource = new CancellationTokenSource();
 
+                        Stopwatch swExec = new Stopwatch();
+                        swExec.Start();
                         RunJob(req).Wait();
+                        swExec.Stop();
+                        Console.WriteLine("Used time for execution per group in worker" + Self.Path + ": " + swExec.ElapsedMilliseconds + "ms");
 /*
  Temporarily disabled.
  TODO: https://github.com/AElfProject/AElf/issues/338
