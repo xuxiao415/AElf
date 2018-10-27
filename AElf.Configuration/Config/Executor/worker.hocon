@@ -13,6 +13,16 @@ akka {
             "System.Object" = hyperion
             "System.Byte[]" = bytes
         }
+        default-fork-join-dispatcher {
+                type = ForkJoinDispatcher
+        		executor = fork-join-executor
+                throughput = 30
+                dedicated-thread-pool { #settings for Helios.DedicatedThreadPool
+                    thread-count = 8 #number of threads
+                    #deadlock-timeout = 3s #optional timeout for deadlock detection
+                    threadtype = background #values can be "background" or "foreground"
+                }
+        }
     }
     remote {
         dot-netty.tcp {
