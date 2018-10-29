@@ -94,8 +94,6 @@ namespace AElf.Execution
                 {
                     return traces;
                 }
-
-                Thread.Sleep(1);
             }
             swExec.Stop();
             Console.WriteLine("Used time for execution per group: " + swExec.ElapsedMilliseconds + "ms");
