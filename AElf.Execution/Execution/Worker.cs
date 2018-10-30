@@ -56,7 +56,7 @@ namespace AElf.Execution
 
                         Stopwatch swExec = new Stopwatch();
                         swExec.Start();
-                        RunJob(req).Wait();
+                        RunJob(req).ContinueWith(t => t.Wait(), TaskContinuationOptions.ExecuteSynchronously);
                         swExec.Stop();
                         Console.WriteLine("Used time for execution per group in worker" + Self.Path + ": " + swExec.ElapsedMilliseconds + "ms");
 /*
